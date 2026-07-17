@@ -1,4 +1,4 @@
-# 分支链记录
+| 07 | feature/merchant-apartments/step-07 | feature/apartment-publish/step-06 | 8fe8f37 | 2026-07-17 | 待合并 |# 分支链记录
 
 | step | 分支名 | 基于分支 | 最新commit | 完成日期 | 状态 |
 |------|--------|----------|------------|----------|------|

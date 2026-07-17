@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { Apartment } from '@/types'
+import type { Apartment, MerchantAuditItem, MerchantApartmentDetail, PaginatedData } from '@/types'
 
 export interface CreateApartmentPayload {
   name: string
@@ -34,7 +34,7 @@ export function getMerchantApartments(params?: { page?: number; page_size?: numb
 }
 
 export function getMerchantApartmentDetail(id: number) {
-  return request.get<Apartment>('/merchant/apartments/' + id)
+  return request.get<MerchantApartmentDetail>('/merchant/apartments/' + id)
 }
 
 export function updateApartment(id: number, payload: CreateApartmentPayload) {
@@ -43,4 +43,8 @@ export function updateApartment(id: number, payload: CreateApartmentPayload) {
 
 export function deleteApartment(id: number) {
   return request.delete('/merchant/apartments/' + id)
+}
+
+export function getMerchantAudits(params?: { page?: number; page_size?: number }) {
+  return request.get<PaginatedData<MerchantAuditItem>>('/merchant/audits', { params })
 }
