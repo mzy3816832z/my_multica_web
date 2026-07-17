@@ -10,15 +10,15 @@ export function register(data: { phone: string; sms_code: string; password: stri
 }
 
 export function loginByPassword(data: { phone: string; password: string }) {
-  return request.post<LoginResult>('/auth/login-by-password', data)
+  return request.post<LoginResult>('/auth/login-by-password', data) as unknown as Promise<LoginResult>
 }
 
 export function loginByCode(data: { phone: string; sms_code: string }) {
-  return request.post<LoginResult>('/auth/login-by-code', data)
+  return request.post<LoginResult>('/auth/login-by-code', data) as unknown as Promise<LoginResult>
 }
 
 export function selectRole(role: 'tenant' | 'landlord') {
-  return request.post<User>('/auth/select-role', { role })
+  return request.post<User>('/auth/select-role', { role }) as unknown as Promise<User>
 }
 
 export function resetPassword(data: { phone: string; sms_code: string; new_password: string }) {
