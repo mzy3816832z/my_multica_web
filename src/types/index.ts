@@ -84,6 +84,18 @@ export interface RoomType {
   min_monthly_rent?: number
 }
 
+export interface Message {
+  id: number
+  user_id: number
+  type: 'first_rejected' | 'change_rejected'
+  title: string
+  content: string
+  related_apartment_id: number
+  related_audit_id?: number
+  is_read: boolean
+  created_at: string
+}
+
 // 租期租金方案
 export interface RentalPlan {
   id: number
