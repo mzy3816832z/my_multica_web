@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { getRoomTypeDetail } from '@/api/apartment'
 import { getDicts } from '@/api/dict'
-import { showToast } from 'vant'
+import { showToast, NavBar, Swipe, SwipeItem, Image as VanImage, Icon, Tag } from 'vant'
 import type { RoomType, RentalPlan, DictItem } from '@/types'
 
 const route = useRoute()

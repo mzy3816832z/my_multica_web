@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { Empty, Button } from 'vant'
 
 const router = useRouter()
 </script>

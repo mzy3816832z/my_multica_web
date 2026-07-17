@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useMessageStore } from '@/stores/message'
+import { Icon, Tag, Cell, Badge, Button } from 'vant'
 
 const router = useRouter()
 const authStore = useAuthStore()

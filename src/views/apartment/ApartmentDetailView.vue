@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import { getApartmentDetail, getRoomTypesByApartment } from '@/api/apartment'
 import { addFavorite, removeFavorite } from '@/api/favorite'
-import { showToast } from 'vant'
+import { showToast, NavBar, Icon, Image as VanImage, Empty, Tag } from 'vant'
 import type { Apartment, RoomType } from '@/types'
 
 const route = useRoute()

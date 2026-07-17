@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { selectRole } from '@/api/auth'
+import { Icon, Button } from 'vant'
 
 const router = useRouter()
 const route = useRoute()

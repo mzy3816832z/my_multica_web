@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
+import { Overlay, Loading } from 'vant'
 
 const uiStore = useUiStore()
 </script>
