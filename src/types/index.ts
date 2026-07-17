@@ -45,3 +45,52 @@ export interface District {
   code: string | null
   sort: number
 }
+
+// 房源列表项 / 详情
+export interface Apartment {
+  id: number
+  name: string
+  cover_image: string
+  description?: string
+  district_id?: number
+  street_id?: number
+  district_name?: string
+  street_name?: string
+  detail_address?: string
+  contact_phone?: string
+  status?: string
+  min_monthly_rent?: number
+  created_at?: string
+  updated_at?: string
+  is_favorite?: boolean
+}
+
+// 房型
+export interface RoomType {
+  id: number
+  apartment_id: number
+  name: string
+  images: string[]
+  facilities: string[]
+  layout_type: string
+  layout_type_label?: string
+  window_type: string
+  window_type_label?: string
+  orientation: string
+  orientation_label?: string
+  floor: number
+  sort: number
+  rental_plans?: RentalPlan[]
+  min_monthly_rent?: number
+}
+
+// 租期租金方案
+export interface RentalPlan {
+  id: number
+  room_type_id: number
+  lease_term: string
+  lease_term_label?: string
+  monthly_rent: number
+  payment_method: string
+  payment_method_label?: string
+}
