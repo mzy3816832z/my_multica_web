@@ -5,3 +5,4 @@
 | 01 | feature/front-init/step-01 | main | - | - | 待合并 |
 | 02 | feature/auth-pages/step-02 | feature/front-init/step-01 | 9b950b7 | 2026-07-17 | 待合并 |
 | 03 | feature/apartment-list/step-03 | feature/auth-pages/step-02 | 8ae664f | 2026-07-17 | 待合并 |
+| 04 | feature/apartment-detail/step-04 | feature/apartment-list/step-03 | 129125a | 2026-07-17 | 待合并 |
