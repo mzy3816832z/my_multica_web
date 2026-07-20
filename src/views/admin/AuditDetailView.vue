@@ -1,21 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  showToast,
-  showConfirmDialog,
-  showDialog,
-  NavBar,
-  Tag,
-  Button,
-  Cell,
-  CellGroup,
-  Image as VanImage,
-  Icon,
-  Loading,
-  Empty,
-  Field,
-} from 'vant'
+
 import { getAdminAuditDetail, approveAudit, rejectAudit } from '@/api/admin'
 import { useUiStore } from '@/stores/ui'
 import type { AuditRecord } from '@/types'
