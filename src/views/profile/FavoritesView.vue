@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import { getFavorites, removeFavorite } from '@/api/favorite'
-import { showToast, NavBar, PullRefresh, List, Empty, Image as VanImage, Icon, Button } from 'vant'
 import type { PaginatedData, Apartment } from '@/types'
 
 const router = useRouter()

@@ -2,7 +2,6 @@
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { sendSmsCode, register } from '@/api/auth'
-import { Form, Field, Icon, Button } from 'vant'
 
 const router = useRouter()
 

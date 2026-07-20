@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { showToast, showConfirmDialog } from 'vant'
 import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import { getDistricts, getDicts } from '@/api/dict'

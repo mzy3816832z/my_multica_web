@@ -5,7 +5,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import { getApartments } from '@/api/apartment'
 import { getDistricts, getDicts } from '@/api/dict'
-import { Icon, Image as VanImage, Badge, PullRefresh, List, Empty, FloatingBubble, Popup, Search, Tag, Field, Button } from 'vant'
 import type { Apartment, District, DictItem } from '@/types'
 
 const router = useRouter()

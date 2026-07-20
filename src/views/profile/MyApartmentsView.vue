@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast, showConfirmDialog, Tabs, Tab, PullRefresh, List, Empty, Loading, Image as VanImage, Tag, Button, Icon, NavBar, Cell, Badge } from 'vant'
 import { getMerchantApartments, getMerchantAudits, deleteApartment } from '@/api/merchant'
 import { useUiStore } from '@/stores/ui'
 import type { Apartment, MerchantAuditItem } from '@/types'

@@ -3,7 +3,6 @@ import { ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { loginByPassword, loginByCode, sendSmsCode } from '@/api/auth'
-import { Form, Field, Icon, Button } from 'vant'
 import type { LoginResult } from '@/types'
 
 const router = useRouter()
