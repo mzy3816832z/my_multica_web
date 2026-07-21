@@ -2,14 +2,12 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useUiStore } from '@/stores/ui'
 import { getApartments } from '@/api/apartment'
 import { getDistricts, getDicts } from '@/api/dict'
 import type { Apartment, District, DictItem } from '@/types'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const uiStore = useUiStore()
 
 // ================= 列表数据 =================
 const list = ref<Apartment[]>([])
@@ -41,6 +39,13 @@ const streets = ref<District[]>([])
 const layoutTypes = ref<DictItem[]>([])
 const leaseTerms = ref<DictItem[]>([])
 
+const districtsLoading = ref(false)
+const districtsError = ref('')
+const streetsLoading = ref(false)
+const streetsError = ref('')
+const dictsLoading = ref(false)
+const dictsError = ref('')
+
 const activeFilterCount = computed(() => {
   let count = 0
   if (filter.district_id !== undefined) count++
@@ -53,22 +58,46 @@ const activeFilterCount = computed(() => {
 
 // ================= 加载字典数据 =================
 async function loadDistricts() {
-  const res = await getDistricts({ level: 1 })
-  districts.value = res as unknown as District[]
+  districtsLoading.value = true
+  districtsError.value = ''
+  try {
+    const res = await getDistricts({ level: 1 })
+    districts.value = res as unknown as District[]
+  } catch {
+    districtsError.value = '加载行政区失败'
+  } finally {
+    districtsLoading.value = false
+  }
 }
 
 async function loadStreets(parentId: number) {
-  const res = await getDistricts({ parent_id: parentId })
-  streets.value = res as unknown as District[]
+  streetsLoading.value = true
+  streetsError.value = ''
+  try {
+    const res = await getDistricts({ parent_id: parentId })
+    streets.value = res as unknown as District[]
+  } catch {
+    streetsError.value = '加载街道失败'
+  } finally {
+    streetsLoading.value = false
+  }
 }
 
 async function loadDicts() {
-  const [layouts, leases] = await Promise.all([
-    getDicts('layout_type'),
-    getDicts('lease_term'),
-  ])
-  layoutTypes.value = layouts as unknown as DictItem[]
-  leaseTerms.value = leases as unknown as DictItem[]
+  dictsLoading.value = true
+  dictsError.value = ''
+  try {
+    const [layouts, leases] = await Promise.all([
+      getDicts('layout_type'),
+      getDicts('lease_term'),
+    ])
+    layoutTypes.value = layouts as unknown as DictItem[]
+    leaseTerms.value = leases as unknown as DictItem[]
+  } catch {
+    dictsError.value = '加载筛选项失败'
+  } finally {
+    dictsLoading.value = false
+  }
 }
 
 watch(() => filter.district_id, (val) => {
@@ -286,7 +315,13 @@ onMounted(() => {
           <!-- 行政区 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">行政区</div>
-            <div class="flex flex-wrap gap-2">
+            <van-loading v-if="districtsLoading" size="20" class="py-2" />
+            <div v-else-if="districtsError" class="text-sm text-red-500 py-2">
+              {{ districtsError }}
+              <span class="text-primary ml-2 cursor-pointer" @click="loadDistricts">重试</span>
+            </div>
+            <div v-else-if="districts.length === 0" class="text-sm text-gray-400 py-2">暂无行政区数据</div>
+            <div v-else class="flex flex-wrap gap-2">
               <van-tag
                 v-for="d in districts"
                 :key="d.id"
@@ -301,9 +336,12 @@ onMounted(() => {
           </div>
 
           <!-- 街道 -->
-          <div v-if="streets.length > 0">
+          <div v-if="filter.district_id !== undefined || streets.length > 0">
             <div class="text-sm font-bold text-gray-900 mb-2">街道/镇</div>
-            <div class="flex flex-wrap gap-2">
+            <van-loading v-if="streetsLoading" size="20" class="py-2" />
+            <div v-else-if="streetsError" class="text-sm text-red-500 py-2">{{ streetsError }}</div>
+            <div v-else-if="streets.length === 0" class="text-sm text-gray-400 py-2">暂无街道/镇数据</div>
+            <div v-else class="flex flex-wrap gap-2">
               <van-tag
                 v-for="s in streets"
                 :key="s.id"
@@ -320,7 +358,10 @@ onMounted(() => {
           <!-- 户型 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">户型</div>
-            <div class="flex flex-wrap gap-2">
+            <van-loading v-if="dictsLoading" size="20" class="py-2" />
+            <div v-else-if="dictsError" class="text-sm text-red-500 py-2">{{ dictsError }}</div>
+            <div v-else-if="layoutTypes.length === 0" class="text-sm text-gray-400 py-2">暂无户型数据</div>
+            <div v-else class="flex flex-wrap gap-2">
               <van-tag
                 v-for="l in layoutTypes"
                 :key="l.code"
@@ -337,7 +378,10 @@ onMounted(() => {
           <!-- 租期 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">租期</div>
-            <div class="flex flex-wrap gap-2">
+            <van-loading v-if="dictsLoading" size="20" class="py-2" />
+            <div v-else-if="dictsError" class="text-sm text-red-500 py-2">{{ dictsError }}</div>
+            <div v-else-if="leaseTerms.length === 0" class="text-sm text-gray-400 py-2">暂无租期数据</div>
+            <div v-else class="flex flex-wrap gap-2">
               <van-tag
                 v-for="t in leaseTerms"
                 :key="t.code"
