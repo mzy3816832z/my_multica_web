@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { getDicts } from '@/api/dict'
 import type { DictItem } from '@/types'
 
@@ -72,15 +72,39 @@ onMounted(() => {
 })
 
 function onConfirm({ selectedOptions }: { selectedOptions: { text: string; value: string }[] }) {
-  if (props.multiple) {
-    const codes = selectedOptions.map(o => o.value)
-    emit('update:modelValue', codes)
-  } else {
-    const selected = selectedOptions[0]
-    if (selected) {
-      emit('update:modelValue', selected.value)
-    }
+  const selected = selectedOptions[0]
+  if (selected) {
+    emit('update:modelValue', selected.value)
   }
+  showPicker.value = false
+}
+
+function onMultiConfirm() {
+  showPicker.value = false
+}
+
+const tempSelected = ref<string[]>([])
+
+function openMultiPicker() {
+  tempSelected.value = ((props.modelValue as string[]) || []).slice()
+  showPicker.value = true
+}
+
+function toggleItem(code: string) {
+  const idx = tempSelected.value.indexOf(code)
+  if (idx >= 0) {
+    tempSelected.value.splice(idx, 1)
+  } else {
+    tempSelected.value.push(code)
+  }
+}
+
+function isSelected(code: string) {
+  return tempSelected.value.includes(code)
+}
+
+function confirmMulti() {
+  emit('update:modelValue', tempSelected.value.slice())
   showPicker.value = false
 }
 
@@ -98,7 +122,7 @@ const columns = computed(() =>
       :placeholder="loading ? '加载中...' : placeholder"
       :border="false"
       class="bg-gray-50 rounded-lg"
-      @click="showPicker = true"
+      @click="multiple ? openMultiPicker() : (showPicker = true)"
     >
       <template #right-icon>
         <van-loading v-if="loading" size="16" />
@@ -113,14 +137,45 @@ const columns = computed(() =>
       暂无选项数据
     </div>
 
-    <van-popup v-model:show="showPicker" position="bottom" round>
-      <van-picker
-        :columns="columns"
-        :title="title"
-        @confirm="onConfirm"
-        @cancel="showPicker = false"
-      />
-    </van-popup>
+    <template v-if="multiple">
+      <van-popup v-model:show="showPicker" position="bottom" round :style="{ maxHeight: '60%' }">
+        <div class="multi-select-popup">
+          <div class="multi-select-header">
+            <span @click="showPicker = false">取消</span>
+            <span class="multi-select-title">{{ title }}</span>
+            <span class="multi-select-confirm" @click="confirmMulti">确定</span>
+          </div>
+          <div class="multi-select-body">
+            <div
+              v-for="item in items"
+              :key="item.code"
+              class="multi-select-item"
+              @click="toggleItem(item.code)"
+            >
+              <span class="text-sm text-gray-900">{{ item.label }}</span>
+              <van-icon
+                :name="isSelected(item.code) ? 'success' : ''"
+                :class="isSelected(item.code) ? 'text-primary' : 'text-gray-300'"
+              />
+            </div>
+            <div v-if="items.length === 0 && !loading" class="text-sm text-gray-400 text-center py-8">
+              暂无选项数据
+            </div>
+          </div>
+        </div>
+      </van-popup>
+    </template>
+
+    <template v-else>
+      <van-popup v-model:show="showPicker" position="bottom" round>
+        <van-picker
+          :columns="columns"
+          :title="title"
+          @confirm="onConfirm"
+          @cancel="showPicker = false"
+        />
+      </van-popup>
+    </template>
   </div>
 </template>
 
@@ -139,5 +194,47 @@ const columns = computed(() =>
 
 .text-primary {
   color: $primary;
+}
+
+.multi-select-popup {
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+}
+
+.multi-select-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #ebedf0;
+  font-size: 14px;
+  color: $text-color;
+}
+
+.multi-select-title {
+  font-weight: bold;
+}
+
+.multi-select-confirm {
+  color: $primary;
+}
+
+.multi-select-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.multi-select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f5f5;
+
+  &:active {
+    background-color: #f7f8fa;
+  }
 }
 </style>
