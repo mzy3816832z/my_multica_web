@@ -60,7 +60,7 @@ const router = createRouter({
       path: '/profile/favorites',
       name: 'Favorites',
       component: () => import('@/views/profile/FavoritesView.vue'),
-      meta: { public: false, title: '我的收藏' },
+      meta: { public: false, roles: ['tenant'], title: '我的收藏' },
     },
     {
       path: '/profile/messages',

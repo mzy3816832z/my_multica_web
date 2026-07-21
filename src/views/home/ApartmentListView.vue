@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getApartments } from '@/api/apartment'
 import { getDistricts, getDicts } from '@/api/dict'
+import { addFavorite, removeFavorite } from '@/api/favorite'
 import type { Apartment, District, DictItem } from '@/types'
 
 const router = useRouter()
@@ -188,6 +189,28 @@ function goCreate() {
   router.push('/profile/apartments/create')
 }
 
+async function toggleFavorite(apartment: Apartment, event: Event) {
+  event.stopPropagation()
+  if (!authStore.isLoggedIn) {
+    showToast('请先登录')
+    router.push({ path: '/login', query: { redirect: '/apartments' } })
+    return
+  }
+  try {
+    if (apartment.is_favorite) {
+      await removeFavorite(apartment.id)
+      apartment.is_favorite = false
+      showToast('已取消收藏')
+    } else {
+      await addFavorite(apartment.id)
+      apartment.is_favorite = true
+      showToast('收藏成功')
+    }
+  } catch {
+    // 错误已在 request 拦截器中 toast
+  }
+}
+
 // ================= 初始化 =================
 onMounted(() => {
   loadDistricts()
@@ -252,6 +275,14 @@ onMounted(() => {
               />
               <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
                 ¥{{ item.min_monthly_rent || '?' }}/月起
+              </div>
+              <div v-if="authStore.isTenant" class="absolute top-2 right-2">
+                <van-icon
+                  :name="item.is_favorite ? 'star' : 'star-o'"
+                  :class="item.is_favorite ? 'text-warning' : 'text-white'"
+                  class="text-xl drop-shadow"
+                  @click.stop="toggleFavorite(item, $event)"
+                />
               </div>
             </div>
             <!-- 信息区 -->
@@ -441,6 +472,14 @@ onMounted(() => {
 
 .empty-state {
   padding-top: 20vh;
+}
+
+.text-warning {
+  color: $warning;
+}
+
+.drop-shadow {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 :deep(.van-search) {

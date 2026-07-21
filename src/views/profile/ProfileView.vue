@@ -23,9 +23,13 @@ const displayName = computed(() => {
 
 // 通用菜单（所有角色）
 const commonMenus = [
-  { title: '我的收藏', path: '/profile/favorites', icon: 'star-o' },
   { title: '我的消息', path: '/profile/messages', icon: 'comment-o', badge: 'unread' },
   { title: '修改密码', path: '/profile/change-password', icon: 'lock' },
+]
+
+// 租客专属菜单
+const tenantMenus = [
+  { title: '我的收藏', path: '/profile/favorites', icon: 'star-o' },
 ]
 
 // 商家专属菜单
@@ -41,6 +45,9 @@ const adminMenus = [
 
 const menus = computed(() => {
   const list = [...commonMenus]
+  if (authStore.isTenant) {
+    list.unshift(...tenantMenus)
+  }
   if (authStore.isLandlord) {
     list.push(...landlordMenus)
   }
