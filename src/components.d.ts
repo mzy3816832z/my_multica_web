@@ -11,6 +11,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    DictSelect: typeof import('./components/DictSelect.vue')['default']
+    DistrictCascader: typeof import('./components/DistrictCascader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VanBadge: typeof import('vant/es')['Badge']
