@@ -87,6 +87,7 @@ onMounted(() => {
     >
       <template #right>
         <van-icon
+          v-if="authStore.isTenant"
           :name="apartment?.is_favorite ? 'star' : 'star-o'"
           :class="apartment?.is_favorite ? 'text-warning' : 'text-gray-400'"
           class="text-xl"

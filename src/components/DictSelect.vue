@@ -73,15 +73,39 @@ onMounted(() => {
 
 function onConfirm({ selectedOptions }: { selectedOptions: { text: string; value: string }[] }) {
   if (props.multiple) {
-    const codes = selectedOptions.map(o => o.value)
-    emit('update:modelValue', codes)
-  } else {
-    const selected = selectedOptions[0]
-    if (selected) {
-      emit('update:modelValue', selected.value)
-    }
+    showToast('多项选择请使用多选模式')
+    return
+  }
+  const selected = selectedOptions[0]
+  if (selected) {
+    emit('update:modelValue', selected.value)
   }
   showPicker.value = false
+}
+
+function onMultiConfirm() {
+  showMultiPicker.value = false
+}
+
+function toggleItem(code: string) {
+  const current = (props.modelValue as string[]) || []
+  const idx = current.indexOf(code)
+  if (idx >= 0) {
+    current.splice(idx, 1)
+  } else {
+    current.push(code)
+  }
+  emit('update:modelValue', [...current])
+}
+
+const showMultiPicker = ref(false)
+
+function openPicker() {
+  if (props.multiple) {
+    showMultiPicker.value = true
+  } else {
+    showPicker.value = true
+  }
 }
 
 const columns = computed(() =>
@@ -98,7 +122,7 @@ const columns = computed(() =>
       :placeholder="loading ? '加载中...' : placeholder"
       :border="false"
       class="bg-gray-50 rounded-lg"
-      @click="showPicker = true"
+      @click="openPicker"
     >
       <template #right-icon>
         <van-loading v-if="loading" size="16" />
@@ -120,6 +144,36 @@ const columns = computed(() =>
         @confirm="onConfirm"
         @cancel="showPicker = false"
       />
+    </van-popup>
+
+    <van-popup v-model:show="showMultiPicker" position="bottom" round :style="{ maxHeight: '60%' }">
+      <div class="flex flex-col h-full">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <span class="text-base font-bold">{{ title }}</span>
+          <span class="text-sm text-primary" @click="onMultiConfirm">确定</span>
+        </div>
+        <div class="flex-1 overflow-y-auto p-3">
+          <van-checkbox-group :model-value="(modelValue as string[]) || []">
+            <van-cell-group :border="false">
+              <van-cell
+                v-for="item in items"
+                :key="item.code"
+                :title="item.label"
+                clickable
+                @click="toggleItem(item.code)"
+              >
+                <template #right-icon>
+                  <van-checkbox
+                    :name="item.code"
+                    :model-value="((modelValue as string[]) || []).includes(item.code)"
+                    @click.stop
+                  />
+                </template>
+              </van-cell>
+            </van-cell-group>
+          </van-checkbox-group>
+        </div>
+      </div>
     </van-popup>
   </div>
 </template>

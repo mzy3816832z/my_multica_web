@@ -2,7 +2,7 @@
 import { ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { loginByPassword, loginByCode, sendSmsCode } from '@/api/auth'
+import { loginByPassword, loginByCode, sendSmsCode, adminLogin } from '@/api/auth'
 import type { LoginResult } from '@/types'
 
 const router = useRouter()
@@ -10,12 +10,14 @@ const route = useRoute()
 const authStore = useAuthStore()
 
 // 登录模式切换
-const mode = ref<'password' | 'code'>('password')
+const mode = ref<'password' | 'code' | 'admin'>('password')
+const isAdminMode = computed(() => mode.value === 'admin')
 
 const form = reactive({
   phone: '',
   password: '',
   smsCode: '',
+  username: '',
 })
 
 const loading = ref(false)
@@ -25,6 +27,9 @@ const smsTimer = ref<ReturnType<typeof setInterval> | null>(null)
 const phoneValid = computed(() => /^1[3-9]\d{9}$/.test(form.phone))
 const canSendSms = computed(() => phoneValid.value && smsCountdown.value === 0)
 const canSubmit = computed(() => {
+  if (isAdminMode.value) {
+    return form.username.trim().length > 0 && form.password.length >= 6
+  }
   if (!phoneValid.value) return false
   if (mode.value === 'password') {
     return form.password.length >= 6
@@ -53,6 +58,12 @@ function handleLoginSuccess(res: LoginResult) {
   authStore.setToken(res.access_token, res.refresh_token)
   authStore.setUser(res.user)
 
+  // 管理员登录后直接跳转审核管理
+  if (res.user.role === 'admin') {
+    router.replace('/admin/audits')
+    return
+  }
+
   // 首次登录无角色 → 强制身份选择
   if (!res.user.role) {
     const redirect = route.query.redirect as string
@@ -68,9 +79,14 @@ async function onSubmit() {
   if (!canSubmit.value) return
   loading.value = true
   try {
-    const res = mode.value === 'password'
-      ? await loginByPassword({ phone: form.phone, password: form.password })
-      : await loginByCode({ phone: form.phone, sms_code: form.smsCode })
+    let res: LoginResult
+    if (isAdminMode.value) {
+      res = await adminLogin({ username: form.username.trim(), password: form.password })
+    } else if (mode.value === 'password') {
+      res = await loginByPassword({ phone: form.phone, password: form.password })
+    } else {
+      res = await loginByCode({ phone: form.phone, sms_code: form.smsCode })
+    }
     handleLoginSuccess(res)
   } catch {
     // 错误已在 request 拦截器中 toast
@@ -109,11 +125,32 @@ async function onSubmit() {
         >
           验证码登录
         </button>
+        <button
+          class="flex-1 py-2 text-sm font-medium rounded-md transition-colors"
+          :class="isAdminMode ? 'bg-white text-primary shadow-sm' : 'text-gray-500'"
+          @click="mode = 'admin'"
+        >
+          管理员
+        </button>
       </div>
 
       <van-form @submit="onSubmit">
-        <!-- 手机号 -->
+        <!-- 管理员模式：用户名 -->
         <van-field
+          v-if="isAdminMode"
+          v-model="form.username"
+          placeholder="请输入管理员用户名"
+          :rules="[{ required: true, message: '请输入用户名' }]"
+          class="mb-3"
+        >
+          <template #left-icon>
+            <van-icon name="user-o" class="text-gray-400 mr-2" />
+          </template>
+        </van-field>
+
+        <!-- 用户模式：手机号 -->
+        <van-field
+          v-if="!isAdminMode"
           v-model="form.phone"
           type="tel"
           maxlength="11"
@@ -128,7 +165,7 @@ async function onSubmit() {
 
         <!-- 密码 -->
         <van-field
-          v-if="mode === 'password'"
+          v-if="mode === 'password' || isAdminMode"
           v-model="form.password"
           type="password"
           placeholder="请输入密码"
@@ -142,7 +179,7 @@ async function onSubmit() {
 
         <!-- 验证码 -->
         <van-field
-          v-else
+          v-if="mode === 'code'"
           v-model="form.smsCode"
           type="digit"
           maxlength="6"
@@ -181,14 +218,14 @@ async function onSubmit() {
       </van-form>
 
       <!-- 底部操作 -->
-      <div class="flex justify-between mt-4 text-sm">
+      <div v-if="!isAdminMode" class="flex justify-between mt-4 text-sm">
         <router-link to="/forgot-password" class="text-gray-500">忘记密码？</router-link>
         <router-link to="/register" class="text-primary">去注册</router-link>
       </div>
     </div>
 
     <!-- 底部协议 -->
-    <div class="px-6 py-4 text-center text-xs text-gray-400">
+    <div v-if="!isAdminMode" class="px-6 py-4 text-center text-xs text-gray-400">
       登录即代表同意
       <span class="text-primary">用户协议</span>
       和
