@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import { getDistricts } from '@/api/dict'
 import type { District } from '@/types'
 
@@ -74,13 +74,21 @@ function onStreetConfirm({ selectedOptions }: { selectedOptions: { text: string;
 }
 
 function emitUpdate() {
+  isUpdatingInternally.value = true
   modelValue.value = {
     district_id: selectedDistrictId.value,
     street_id: selectedStreetId.value
   }
+  nextTick(() => {
+    isUpdatingInternally.value = false
+  })
 }
 
+const isUpdatingInternally = ref(false)
+
 watch(() => modelValue.value, (val) => {
+  if (isUpdatingInternally.value) return
+
   const dId = val?.district_id
   const sId = val?.street_id
 
@@ -94,12 +102,16 @@ watch(() => modelValue.value, (val) => {
       const found = districts.value.find(d => d.id === dId)
       if (found) {
         districtLabel.value = found.name
-        loadStreets(dId)
+        loadStreets(dId).then(() => {
+          if (sId) {
+            selectedStreetId.value = sId
+            const s = streets.value.find(s => s.id === sId)
+            if (s) {
+              streetLabel.value = s.name
+            }
+          }
+        })
       }
-    }
-
-    if (sId !== selectedStreetId.value) {
-      selectedStreetId.value = sId
     }
   } else if (sId !== selectedStreetId.value) {
     selectedStreetId.value = sId

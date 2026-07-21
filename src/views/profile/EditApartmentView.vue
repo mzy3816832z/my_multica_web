@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
-import { getDistricts, getDicts } from '@/api/dict'
 import { getMerchantApartmentDetail, updateApartment } from '@/api/merchant'
 import { uploadImage } from '@/api/upload'
-import type { District, DictItem, RoomType, RentalPlan } from '@/types'
+import type { RoomType, RentalPlan } from '@/types'
 
 const router = useRouter()
 const route = useRoute()
@@ -45,55 +44,16 @@ interface RentalPlanFormItem {
   payment_method: string
 }
 
-// ================= 字典数据 =================
-const districts = ref<District[]>([])
-const streets = ref<District[]>([])
-const layoutTypes = ref<DictItem[]>([])
-const windowTypes = ref<DictItem[]>([])
-const orientations = ref<DictItem[]>([])
-const facilities = ref<DictItem[]>([])
-const leaseTerms = ref<DictItem[]>([])
-const paymentMethods = ref<DictItem[]>([])
-
-// ================= 选择器状态 =================
-const showLeaseTermPicker = ref(false)
-const showPaymentPicker = ref(false)
-const editingPlanIndex = ref(-1)
-
-// ================= 加载字典 =================
-async function loadDistricts() {
-  const res = await getDistricts({ level: 1 })
-  districts.value = res as unknown as District[]
-}
-
-async function loadStreets(parentId: number) {
-  const res = await getDistricts({ parent_id: parentId })
-  streets.value = res as unknown as District[]
-}
-
-async function loadDicts() {
-  const [layouts, windows, orients, facs, leases, payments] = await Promise.all([
-    getDicts('layout_type'),
-    getDicts('window_type'),
-    getDicts('orientation'),
-    getDicts('facility'),
-    getDicts('lease_term'),
-    getDicts('payment_method'),
-  ])
-  layoutTypes.value = layouts as unknown as DictItem[]
-  windowTypes.value = windows as unknown as DictItem[]
-  orientations.value = orients as unknown as DictItem[]
-  facilities.value = facs as unknown as DictItem[]
-  leaseTerms.value = leases as unknown as DictItem[]
-  paymentMethods.value = payments as unknown as DictItem[]
-}
-
-watch(() => form.district_id, (val) => {
-  form.street_id = undefined
-  streets.value = []
-  if (val) {
-    loadStreets(val)
-  }
+// ================= 行政区级联模型 =================
+const districtModel = computed({
+  get: () => ({
+    district_id: form.district_id,
+    street_id: form.street_id,
+  }),
+  set: (val) => {
+    form.district_id = val?.district_id
+    form.street_id = val?.street_id
+  },
 })
 
 // ================= 加载房源详情 =================
@@ -137,11 +97,6 @@ async function loadApartmentDetail() {
         payment_method: p.payment_method,
       })),
     }))
-
-    // 加载对应街道
-    if (data.district_id) {
-      await loadStreets(data.district_id)
-    }
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {
@@ -387,21 +342,6 @@ async function removeRoomType(index: number) {
   }
 }
 
-// 选择器确认
-function onLeaseTermConfirm({ selectedOptions }: { selectedOptions: { text: string; value: string }[] }) {
-  if (editingPlanIndex.value >= 0) {
-    roomForm.rental_plans[editingPlanIndex.value].lease_term = selectedOptions[0].value
-  }
-  showLeaseTermPicker.value = false
-}
-
-function onPaymentConfirm({ selectedOptions }: { selectedOptions: { text: string; value: string }[] }) {
-  if (editingPlanIndex.value >= 0) {
-    roomForm.rental_plans[editingPlanIndex.value].payment_method = selectedOptions[0].value
-  }
-  showPaymentPicker.value = false
-}
-
 // ================= 表单校验与提交 =================
 const canSubmit = computed(() => {
   return (
@@ -499,8 +439,6 @@ async function onSubmit() {
 
 // ================= 初始化 =================
 onMounted(() => {
-  loadDistricts()
-  loadDicts()
   loadApartmentDetail()
 })
 </script>
@@ -571,39 +509,7 @@ onMounted(() => {
       <!-- 所在位置 -->
       <div class="bg-white rounded-xl p-4 space-y-3">
         <div class="text-sm font-bold text-gray-900">所在位置 <span class="text-danger">*</span></div>
-        <!-- 行政区 -->
-        <div>
-          <div class="text-sm text-gray-600 mb-2">行政区</div>
-          <div class="flex flex-wrap gap-2">
-            <van-tag
-              v-for="d in districts"
-              :key="d.id"
-              :type="form.district_id === d.id ? 'primary' : 'default'"
-              size="large"
-              round
-              @click="form.district_id = form.district_id === d.id ? undefined : d.id"
-            >
-              {{ d.name }}
-            </van-tag>
-          </div>
-        </div>
-        <!-- 街道 -->
-        <div v-if="streets.length > 0">
-          <div class="text-sm text-gray-600 mb-2">街道/镇</div>
-          <div class="flex flex-wrap gap-2">
-            <van-tag
-              v-for="s in streets"
-              :key="s.id"
-              :type="form.street_id === s.id ? 'primary' : 'default'"
-              size="large"
-              round
-              @click="form.street_id = form.street_id === s.id ? undefined : s.id"
-            >
-              {{ s.name }}
-            </van-tag>
-          </div>
-        </div>
-        <!-- 详细地址 -->
+        <DistrictCascader v-model="districtModel" />
         <van-field
           v-model="form.detail_address"
           placeholder="请输入详细门牌号"
@@ -647,7 +553,7 @@ onMounted(() => {
             <div class="flex-1 min-w-0">
               <div class="text-sm font-bold text-gray-900 truncate">{{ room.name }}</div>
               <div class="text-xs text-gray-500 mt-1">
-                {{ layoutTypes.find(l => l.code === room.layout_type)?.label || room.layout_type }} ·
+                {{ room.layout_type }} ·
                 {{ room.floor }}层 ·
                 {{ room.rental_plans.length }} 组方案
               </div>
@@ -731,52 +637,19 @@ onMounted(() => {
           <!-- 户型 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">户型 <span class="text-danger">*</span></div>
-            <div class="flex flex-wrap gap-2">
-              <van-tag
-                v-for="l in layoutTypes"
-                :key="l.code"
-                :type="roomForm.layout_type === l.code ? 'primary' : 'default'"
-                size="large"
-                round
-                @click="roomForm.layout_type = roomForm.layout_type === l.code ? '' : l.code"
-              >
-                {{ l.label }}
-              </van-tag>
-            </div>
+            <DictSelect category="layout_type" v-model="roomForm.layout_type" title="选择户型" placeholder="请选择户型" />
           </div>
 
           <!-- 窗户类型 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">窗户类型 <span class="text-danger">*</span></div>
-            <div class="flex flex-wrap gap-2">
-              <van-tag
-                v-for="w in windowTypes"
-                :key="w.code"
-                :type="roomForm.window_type === w.code ? 'primary' : 'default'"
-                size="large"
-                round
-                @click="roomForm.window_type = roomForm.window_type === w.code ? '' : w.code"
-              >
-                {{ w.label }}
-              </van-tag>
-            </div>
+            <DictSelect category="window_type" v-model="roomForm.window_type" title="选择窗户类型" placeholder="请选择窗户类型" />
           </div>
 
           <!-- 朝向 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">朝向 <span class="text-danger">*</span></div>
-            <div class="flex flex-wrap gap-2">
-              <van-tag
-                v-for="o in orientations"
-                :key="o.code"
-                :type="roomForm.orientation === o.code ? 'primary' : 'default'"
-                size="large"
-                round
-                @click="roomForm.orientation = roomForm.orientation === o.code ? '' : o.code"
-              >
-                {{ o.label }}
-              </van-tag>
-            </div>
+            <DictSelect category="orientation" v-model="roomForm.orientation" title="选择朝向" placeholder="请选择朝向" />
           </div>
 
           <!-- 楼层 -->
@@ -794,22 +667,7 @@ onMounted(() => {
           <!-- 设施 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">设施</div>
-            <div class="flex flex-wrap gap-2">
-              <van-tag
-                v-for="f in facilities"
-                :key="f.code"
-                :type="roomForm.facilities.includes(f.code) ? 'primary' : 'default'"
-                size="large"
-                round
-                @click="
-                  roomForm.facilities = roomForm.facilities.includes(f.code)
-                    ? roomForm.facilities.filter(c => c !== f.code)
-                    : [...roomForm.facilities, f.code]
-                "
-              >
-                {{ f.label }}
-              </van-tag>
-            </div>
+            <DictSelect category="facility" v-model="roomForm.facilities" multiple title="选择设施" placeholder="请选择设施" />
           </div>
 
           <!-- 租金方案 -->
@@ -833,17 +691,9 @@ onMounted(() => {
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-sm text-gray-600 w-16 flex-shrink-0">租期</span>
-                  <van-field
-                    v-model="plan.lease_term"
-                    readonly
-                    placeholder="请选择"
-                    :border="false"
-                    class="flex-1 bg-white rounded-lg"
-                    @click="
-                      showLeaseTermPicker = true;
-                      editingPlanIndex = idx;
-                    "
-                  />
+                  <div class="flex-1">
+                    <DictSelect category="lease_term" v-model="plan.lease_term" title="选择租期" placeholder="请选择租期" />
+                  </div>
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-sm text-gray-600 w-16 flex-shrink-0">月租金</span>
@@ -857,17 +707,9 @@ onMounted(() => {
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-sm text-gray-600 w-16 flex-shrink-0">支付方式</span>
-                  <van-field
-                    v-model="plan.payment_method"
-                    readonly
-                    placeholder="请选择"
-                    :border="false"
-                    class="flex-1 bg-white rounded-lg"
-                    @click="
-                      showPaymentPicker = true;
-                      editingPlanIndex = idx;
-                    "
-                  />
+                  <div class="flex-1">
+                    <DictSelect category="payment_method" v-model="plan.payment_method" title="选择支付方式" placeholder="请选择支付方式" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -881,24 +723,6 @@ onMounted(() => {
           </van-button>
         </div>
       </div>
-    </van-popup>
-
-    <!-- 租期选择器 -->
-    <van-popup v-model:show="showLeaseTermPicker" position="bottom" round>
-      <van-picker
-        :columns="leaseTerms.map(t => ({ text: t.label, value: t.code }))"
-        @confirm="onLeaseTermConfirm"
-        @cancel="showLeaseTermPicker = false"
-      />
-    </van-popup>
-
-    <!-- 支付方式选择器 -->
-    <van-popup v-model:show="showPaymentPicker" position="bottom" round>
-      <van-picker
-        :columns="paymentMethods.map(t => ({ text: t.label, value: t.code }))"
-        @confirm="onPaymentConfirm"
-        @cancel="showPaymentPicker = false"
-      />
     </van-popup>
   </div>
 </template>
