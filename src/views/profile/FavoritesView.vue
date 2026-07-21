@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import { getFavorites, removeFavorite } from '@/api/favorite'
-import type { PaginatedData, Apartment } from '@/types'
+import type { Apartment } from '@/types'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -23,8 +23,7 @@ async function fetchList(isRefresh = false) {
   loading.value = true
   try {
     const currentPage = isRefresh ? 1 : page.value
-    const res = await getFavorites({ page: currentPage, page_size: pageSize.value })
-    const data = res as unknown as PaginatedData<Apartment>
+    const data = await getFavorites({ page: currentPage, page_size: pageSize.value })
     if (isRefresh) {
       list.value = data.items
       page.value = 1

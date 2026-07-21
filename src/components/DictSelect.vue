@@ -50,7 +50,7 @@ async function loadDicts() {
   error.value = ''
   try {
     const res = await getDicts(props.category)
-    items.value = res as unknown as DictItem[]
+    items.value = res
     updateLabel()
   } catch {
     error.value = '加载选项失败'

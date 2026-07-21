@@ -76,7 +76,7 @@ async function onCoverChange(e: Event) {
   uploadingCover.value = true
   try {
     const res = await uploadImage(file)
-    form.cover_image = (res as unknown as { url: string }).url
+    form.cover_image = res.url
     showToast('上传成功')
   } catch {
     // 错误已在 request 拦截器中 toast
@@ -178,7 +178,7 @@ async function onRoomImageChange(e: Event) {
   uploadingRoomImage.value = true
   try {
     const res = await uploadImage(file)
-    roomForm.images.push((res as unknown as { url: string }).url)
+    roomForm.images.push(res.url)
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {

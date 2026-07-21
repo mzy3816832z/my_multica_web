@@ -20,7 +20,7 @@ async function loadDetail() {
   loading.value = true
   try {
     const res = await getAdminAuditDetail(auditId)
-    detail.value = res as unknown as AuditRecord
+    detail.value = res
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {

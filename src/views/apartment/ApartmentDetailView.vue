@@ -30,8 +30,8 @@ async function fetchDetail() {
       getApartmentDetail(apartmentId),
       getRoomTypesByApartment(apartmentId),
     ])
-    apartment.value = aptRes as unknown as Apartment
-    roomTypes.value = (roomsRes as unknown as RoomType[]) || []
+    apartment.value = aptRes
+    roomTypes.value = roomsRes || []
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {

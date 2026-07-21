@@ -26,9 +26,9 @@ async function loadDicts() {
       getDicts('payment_method'),
       getDicts('lease_term'),
     ])
-    facilityDicts.value = facilities as unknown as DictItem[]
-    paymentDicts.value = payments as unknown as DictItem[]
-    leaseDicts.value = leases as unknown as DictItem[]
+    facilityDicts.value = facilities
+    paymentDicts.value = payments
+    leaseDicts.value = leases
   } catch {
     // 静默失败，使用原始编码展示
   }
@@ -59,7 +59,7 @@ async function fetchDetail() {
   uiStore.showLoading('加载中...')
   try {
     const res = await getRoomTypeDetail(roomTypeId)
-    roomType.value = res as unknown as RoomType
+    roomType.value = res
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {

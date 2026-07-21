@@ -63,7 +63,7 @@ async function loadDistricts() {
   districtsError.value = ''
   try {
     const res = await getDistricts({ level: 1 })
-    districts.value = res as unknown as District[]
+    districts.value = res
   } catch {
     districtsError.value = '加载行政区失败'
   } finally {
@@ -76,7 +76,7 @@ async function loadStreets(parentId: number) {
   streetsError.value = ''
   try {
     const res = await getDistricts({ parent_id: parentId })
-    streets.value = res as unknown as District[]
+    streets.value = res
   } catch {
     streetsError.value = '加载街道失败'
   } finally {
@@ -92,8 +92,8 @@ async function loadDicts() {
       getDicts('layout_type'),
       getDicts('lease_term'),
     ])
-    layoutTypes.value = layouts as unknown as DictItem[]
-    leaseTerms.value = leases as unknown as DictItem[]
+    layoutTypes.value = layouts
+    leaseTerms.value = leases
   } catch {
     dictsError.value = '加载筛选项失败'
   } finally {
@@ -126,8 +126,7 @@ async function fetchList(isRefresh = false) {
       page: currentPage,
       page_size: pageSize.value,
     }
-    const res = await getApartments(params)
-    const data = res as unknown as { items: Apartment[]; total: number; page: number; page_size: number }
+    const data = await getApartments(params)
     if (isRefresh) {
       list.value = data.items
       page.value = 1

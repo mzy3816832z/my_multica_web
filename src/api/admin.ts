@@ -8,18 +8,18 @@ export interface AuditListParams {
   page_size?: number
 }
 
-export function getAdminAudits(params?: AuditListParams) {
-  return request.get<PaginatedData<AuditRecord>>('/admin/audits', { params })
+export function getAdminAudits(params?: AuditListParams): Promise<PaginatedData<AuditRecord>> {
+  return request.get('/admin/audits', { params })
 }
 
-export function getAdminAuditDetail(id: number) {
-  return request.get<AuditRecord>('/admin/audits/' + id)
+export function getAdminAuditDetail(id: number): Promise<AuditRecord> {
+  return request.get('/admin/audits/' + id)
 }
 
-export function approveAudit(id: number) {
+export function approveAudit(id: number): Promise<void> {
   return request.post('/admin/audits/' + id + '/approve')
 }
 
-export function rejectAudit(id: number, reason: string) {
+export function rejectAudit(id: number, reason: string): Promise<void> {
   return request.post('/admin/audits/' + id + '/reject', { reason })
 }

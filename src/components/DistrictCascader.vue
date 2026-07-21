@@ -28,7 +28,7 @@ async function loadDistricts() {
   errorDistricts.value = ''
   try {
     const res = await getDistricts({ level: 1 })
-    districts.value = res as unknown as District[]
+    districts.value = res
   } catch {
     errorDistricts.value = '加载行政区失败'
   } finally {
@@ -42,7 +42,7 @@ async function loadStreets(parentId: number) {
   streets.value = []
   try {
     const res = await getDistricts({ parent_id: parentId })
-    streets.value = res as unknown as District[]
+    streets.value = res
   } catch {
     errorStreets.value = '加载街道失败'
   } finally {

@@ -40,8 +40,7 @@ async function loadList(isRefresh = false) {
     if (keyword.value.trim()) {
       params.keyword = keyword.value.trim()
     }
-    const res = await getAdminAudits(params)
-    const data = res as unknown as { items: AuditRecord[]; total: number; page: number; page_size: number }
+    const data = await getAdminAudits(params)
     if (isRefresh) {
       list.value = data.items
     } else {

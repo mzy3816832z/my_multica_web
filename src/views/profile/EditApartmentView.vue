@@ -63,25 +63,14 @@ async function loadApartmentDetail() {
   if (!apartmentId) return
   loadingDetail.value = true
   try {
-    const res = await getMerchantApartmentDetail(apartmentId)
-    const data = res as unknown as {
-      id: number
-      name: string
-      cover_image: string
-      description: string
-      district_id: number
-      street_id: number
-      detail_address: string
-      contact_phone: string
-      room_types: RoomType[]
-    }
+    const data = await getMerchantApartmentDetail(apartmentId)
     form.name = data.name
     form.cover_image = data.cover_image
-    form.description = data.description
+    form.description = data.description || ''
     form.district_id = data.district_id
     form.street_id = data.street_id
-    form.detail_address = data.detail_address
-    form.contact_phone = data.contact_phone
+    form.detail_address = data.detail_address || ''
+    form.contact_phone = data.contact_phone || ''
     form.room_types = (data.room_types || []).map((r: RoomType) => ({
       id: r.id,
       name: r.name,
@@ -129,7 +118,7 @@ async function onCoverChange(e: Event) {
   uploadingCover.value = true
   try {
     const res = await uploadImage(file)
-    form.cover_image = (res as unknown as { url: string }).url
+    form.cover_image = res.url
     showToast('上传成功')
   } catch {
     // 错误已在 request 拦截器中 toast
@@ -231,7 +220,7 @@ async function onRoomImageChange(e: Event) {
   uploadingRoomImage.value = true
   try {
     const res = await uploadImage(file)
-    roomForm.images.push((res as unknown as { url: string }).url)
+    roomForm.images.push(res.url)
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {
