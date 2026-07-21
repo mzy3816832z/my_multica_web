@@ -122,7 +122,7 @@ const columns = computed(() =>
       :placeholder="loading ? '加载中...' : placeholder"
       :border="false"
       class="bg-gray-50 rounded-lg"
-      @click="multiple ? openMultiPicker() : (showPicker = true)"
+      @click="loading || items.length === 0 ? undefined : (multiple ? openMultiPicker() : (showPicker = true))"
     >
       <template #right-icon>
         <van-loading v-if="loading" size="16" />

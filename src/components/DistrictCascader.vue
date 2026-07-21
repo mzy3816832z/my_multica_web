@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { getDistricts } from '@/api/dict'
 import type { District } from '@/types'
 
@@ -150,7 +150,7 @@ const streetColumns = computed(() =>
         :placeholder="loadingDistricts ? '加载中...' : '请选择行政区'"
         :border="false"
         class="flex-1 bg-gray-50 rounded-lg"
-        @click="showDistrictPicker = true"
+        @click="loadingDistricts || districts.length === 0 ? undefined : (showDistrictPicker = true)"
       >
         <template #right-icon>
           <van-loading v-if="loadingDistricts" size="16" />
@@ -165,7 +165,7 @@ const streetColumns = computed(() =>
         :placeholder="loadingStreets ? '加载中...' : '请选择街道/镇'"
         :border="false"
         class="flex-1 bg-gray-50 rounded-lg"
-        @click="selectedDistrictId ? showStreetPicker = true : undefined"
+        @click="selectedDistrictId && !loadingStreets && streets.length > 0 ? (showStreetPicker = true) : undefined"
       >
         <template #right-icon>
           <van-loading v-if="loadingStreets" size="16" />
