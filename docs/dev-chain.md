@@ -11,3 +11,4 @@
 | 07 | feature/merchant-apartments/step-07 | feature/apartment-publish/step-06 | d007441 | 2026-07-17 | 已合并 |
 | 08 | feature/admin-audit/step-08 | feature/merchant-apartments/step-07 | cca3059 | 2026-07-17 | 已合并 |
 | 02 | feature/vant-auto-import/step-02 | feature/admin-audit/step-08 | 80cfeba | 2026-07-20 | 已合并 |
+| 02 | feature/apartment-rental/web-step-2 | feature/apartment-rental/web-step-1 | a0a990f | 2026-07-21 | 待合并 |
