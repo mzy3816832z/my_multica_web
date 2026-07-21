@@ -53,9 +53,34 @@ npm run preview
 
 ## 环境变量
 
+项目使用 Vite 环境变量机制，变量需以 `VITE_` 前缀声明才能在客户端代码中访问。
+
+### 配置方式
+
+```bash
+# 首次使用：复制示例文件创建本地配置
+cp .env.example .env
+```
+
+### 变量列表
+
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
 | `VITE_API_BASE_URL` | 后端 API 基础路径 | `/api/v1` |
+
+### 本地开发
+
+本地开发时保持 `VITE_API_BASE_URL=/api/v1` 即可，Vite 开发服务器会将 `/api` 开头的请求代理转发到后端（见 `vite.config.ts` 中的 proxy 配置）。
+
+### 生产部署
+
+生产环境构建前，修改 `.env` 中的 `VITE_API_BASE_URL` 为实际后端地址，例如：
+
+```
+VITE_API_BASE_URL=https://api.your-domain.com/api/v1
+```
+
+> `.env` 文件已加入 `.gitignore`，不会被提交到仓库。`.env.example` 作为配置模板供团队成员参考。
 
 ## 响应式基准
 
