@@ -15,3 +15,4 @@
 | 03 | feature/apartment-rental/web-step-3 | feature/apartment-rental/web-step-2 | 8aae0cc | 2026-07-21 | 待合并 |
 | 04 | feature/apartment-rental/web-step-4 | feature/apartment-rental/web-step-3 | b2aef78 | 2026-07-21 | 待合并 |
 | 05 | feature/apartment-rental/web-step-5 | feature/apartment-rental/web-step-4 | e2dbcb9 | 2026-07-21 | 待合并 |
+| 06 | feature/apartment-rental/web-step-6 | feature/apartment-rental/web-step-5 | 3db0557 | 2026-07-21 | 待合并 |
