@@ -585,7 +585,7 @@ async function onSubmit() {
           <!-- 朝向 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">朝向 <span class="text-danger">*</span></div>
-            <DictSelect category="orientation" v-model="roomForm.orientation" placeholder="请选择朝向" title="选择朝向" />
+            <DictSelect category="window_orientation" v-model="roomForm.orientation" placeholder="请选择朝向" title="选择朝向" />
           </div>
 
           <!-- 楼层 -->
