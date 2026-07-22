@@ -236,26 +236,53 @@ function triggerRoomImageUpload() {
 
 async function onRoomImageChange(e: Event) {
   const target = e.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
+  const files = Array.from(target.files || [])
+  if (files.length === 0) return
 
-  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-    showToast('仅支持 jpg/png/webp 格式')
+  const remainingSlots = 5 - roomForm.images.length
+  if (files.length > remainingSlots) {
+    showToast(`最多上传 5 张图片，当前还可上传 ${remainingSlots} 张`)
+    target.value = ''
     return
   }
-  if (file.size > 5 * 1024 * 1024) {
-    showToast('图片大小不能超过 5MB')
-    return
-  }
-  if (roomForm.images.length >= 5) {
-    showToast('最多上传 5 张图片')
+
+  const validFiles = files.filter(file => {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showToast(`${file.name} 格式不支持，仅支持 jpg/png/webp`)
+      return false
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast(`${file.name} 超过 5MB 大小限制`)
+      return false
+    }
+    return true
+  })
+
+  if (validFiles.length === 0) {
+    target.value = ''
     return
   }
 
   uploadingRoomImage.value = true
   try {
-    const res = await uploadImage(file)
-    roomForm.images.push(res.url)
+    const results = await Promise.allSettled(validFiles.map(file => uploadImage(file)))
+    const uploadedUrls: string[] = []
+    let failCount = 0
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        uploadedUrls.push(result.value.url)
+      } else {
+        failCount++
+      }
+    })
+
+    roomForm.images.push(...uploadedUrls)
+
+    if (failCount > 0) {
+      showToast(`${uploadedUrls.length} 张上传成功，${failCount} 张失败`)
+    } else {
+      showToast(`成功上传 ${uploadedUrls.length} 张图片`)
+    }
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {
@@ -449,8 +476,8 @@ async function onSubmit() {
       name: form.name.trim(),
       cover_image: form.cover_image,
       description: form.description.trim(),
-      district_id: form.district_id,
-      street_id: form.street_id,
+      district_id: form.district_id as number,
+      street_id: form.street_id as number,
       detail_address: form.detail_address.trim(),
       contact_phone: form.contact_phone.trim(),
       room_types: form.room_types.map(r => ({
@@ -674,14 +701,15 @@ onMounted(() => {
                 class="w-20 h-20 bg-gray-50 rounded-lg flex flex-col items-center justify-center border border-dashed border-gray-300"
                 @click="triggerRoomImageUpload"
               >
-                <van-icon v-if="uploadingRoomImage" name="loading" class="text-primary animate-spin" />
-                <template v-else>
-                  <van-icon name="photograph" class="text-gray-400 text-lg" />
-                  <span class="text-xs text-gray-400 mt-1">上传</span>
-                </template>
+              <van-icon v-if="uploadingRoomImage" name="loading" class="text-primary animate-spin" />
+              <template v-else>
+                <van-icon name="photograph" class="text-gray-400 text-lg" />
+                <span class="text-xs text-gray-400 mt-1">上传</span>
+              </template>
+              <span v-if="uploadingRoomImage" class="text-xs text-primary mt-1">上传中</span>
               </div>
             </div>
-            <input ref="roomImageUploader" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" @change="onRoomImageChange" />
+            <input ref="roomImageUploader" type="file" accept="image/jpeg,image/png,image/webp" multiple class="hidden" @change="onRoomImageChange" />
             <div v-if="roomFormErrors.images" class="text-danger text-xs mt-1">{{ roomFormErrors.images }}</div>
           </div>
 
