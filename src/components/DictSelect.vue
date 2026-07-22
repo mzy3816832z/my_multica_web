@@ -167,7 +167,6 @@ const columns = computed(() =>
                   <van-checkbox
                     :name="item.code"
                     :model-value="tempSelected.includes(item.code)"
-                    @click.stop
                   />
                 </template>
               </van-cell>
