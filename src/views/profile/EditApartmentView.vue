@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
@@ -43,6 +43,39 @@ interface RentalPlanFormItem {
   monthly_rent: number | undefined
   payment_method: string
 }
+
+// ================= 表单校验错误 =================
+const formErrors = reactive<Record<string, string>>({})
+const roomFormErrors = reactive<Record<string, string>>({})
+const rentalPlanErrors = ref<Record<number, Record<string, string>>>({})
+
+function clearRentalPlanError(planIdx: number, field: string) {
+  if (rentalPlanErrors.value[planIdx]) {
+    delete rentalPlanErrors.value[planIdx][field]
+    if (Object.keys(rentalPlanErrors.value[planIdx]).length === 0) {
+      delete rentalPlanErrors.value[planIdx]
+    }
+  }
+}
+
+// 主表单字段变更时清除对应错误
+watch(() => form.name, () => { delete formErrors.name })
+watch(() => form.cover_image, () => { delete formErrors.cover_image })
+watch(() => form.description, () => { delete formErrors.description })
+watch(() => form.district_id, () => { delete formErrors.district_id })
+watch(() => form.street_id, () => { delete formErrors.street_id })
+watch(() => form.detail_address, () => { delete formErrors.detail_address })
+watch(() => form.contact_phone, () => { delete formErrors.contact_phone })
+watch(() => form.room_types.length, () => { if (form.room_types.length > 0) delete formErrors.room_types })
+
+// 房型表单字段变更时清除对应错误
+watch(() => roomForm.name, () => { delete roomFormErrors.name })
+watch(() => roomForm.images.length, () => { if (roomForm.images.length > 0) delete roomFormErrors.images })
+watch(() => roomForm.layout_type, () => { delete roomFormErrors.layout_type })
+watch(() => roomForm.window_type, () => { delete roomFormErrors.window_type })
+watch(() => roomForm.orientation, () => { delete roomFormErrors.orientation })
+watch(() => roomForm.floor, () => { delete roomFormErrors.floor })
+watch(() => roomForm.rental_plans.length, () => { if (roomForm.rental_plans.length > 0) delete roomFormErrors.rental_plans })
 
 // ================= 行政区级联模型 =================
 const districtModel = computed({
@@ -184,6 +217,8 @@ function resetRoomForm() {
   roomForm.orientation = ''
   roomForm.floor = undefined
   roomForm.rental_plans = []
+  Object.keys(roomFormErrors).forEach(k => delete roomFormErrors[k])
+  rentalPlanErrors.value = {}
 }
 
 function closeRoomModal() {
@@ -248,48 +283,60 @@ function removeRentalPlan(index: number) {
 
 // 保存房型
 function saveRoom() {
+  Object.keys(roomFormErrors).forEach(k => delete roomFormErrors[k])
+  rentalPlanErrors.value = {}
+  let hasError = false
+
   if (!roomForm.name.trim()) {
-    showToast('请输入房型名称')
-    return
+    roomFormErrors.name = '请输入房型名称'
+    hasError = true
   }
   if (roomForm.images.length === 0) {
-    showToast('请至少上传 1 张房型图片')
-    return
+    roomFormErrors.images = '请至少上传 1 张房型图片'
+    hasError = true
   }
   if (!roomForm.layout_type) {
-    showToast('请选择户型')
-    return
+    roomFormErrors.layout_type = '请选择户型'
+    hasError = true
   }
   if (!roomForm.window_type) {
-    showToast('请选择窗户类型')
-    return
+    roomFormErrors.window_type = '请选择窗户类型'
+    hasError = true
   }
   if (!roomForm.orientation) {
-    showToast('请选择朝向')
-    return
+    roomFormErrors.orientation = '请选择朝向'
+    hasError = true
   }
   if (roomForm.floor === undefined || roomForm.floor === null) {
-    showToast('请输入楼层')
-    return
+    roomFormErrors.floor = '请输入楼层'
+    hasError = true
   }
   if (roomForm.rental_plans.length === 0) {
-    showToast('请至少添加 1 组租金方案')
-    return
+    roomFormErrors.rental_plans = '请至少添加 1 组租金方案'
+    hasError = true
   }
   for (let i = 0; i < roomForm.rental_plans.length; i++) {
     const plan = roomForm.rental_plans[i]
     if (!plan.lease_term) {
-      showToast(`租金方案 ${i + 1}：请选择租期`)
-      return
+      if (!rentalPlanErrors.value[i]) rentalPlanErrors.value[i] = {}
+      rentalPlanErrors.value[i].lease_term = '请选择租期'
+      hasError = true
     }
     if (!plan.monthly_rent || plan.monthly_rent <= 0) {
-      showToast(`租金方案 ${i + 1}：请输入正确的月租金`)
-      return
+      if (!rentalPlanErrors.value[i]) rentalPlanErrors.value[i] = {}
+      rentalPlanErrors.value[i].monthly_rent = '请输入有效的月租金'
+      hasError = true
     }
     if (!plan.payment_method) {
-      showToast(`租金方案 ${i + 1}：请选择支付方式`)
-      return
+      if (!rentalPlanErrors.value[i]) rentalPlanErrors.value[i] = {}
+      rentalPlanErrors.value[i].payment_method = '请选择支付方式'
+      hasError = true
     }
+  }
+
+  if (hasError) {
+    showToast('请完善房型信息')
+    return
   }
 
   const roomData: RoomTypeFormItem = {
@@ -346,48 +393,53 @@ const canSubmit = computed(() => {
 })
 
 async function onSubmit() {
+  Object.keys(formErrors).forEach(k => delete formErrors[k])
+  let hasError = false
+
   if (!form.name.trim()) {
-    showToast('请输入公寓名称')
-    return
-  }
-  if (form.name.trim().length < 2 || form.name.trim().length > 50) {
-    showToast('公寓名称需在 2-50 字之间')
-    return
+    formErrors.name = '请输入公寓名称'
+    hasError = true
+  } else if (form.name.trim().length < 2 || form.name.trim().length > 50) {
+    formErrors.name = '公寓名称需在 2-50 字之间'
+    hasError = true
   }
   if (!form.cover_image) {
-    showToast('请上传公寓总览图')
-    return
+    formErrors.cover_image = '请上传公寓总览图'
+    hasError = true
   }
   if (!form.description.trim()) {
-    showToast('请输入公寓描述')
-    return
-  }
-  if (form.description.trim().length > 500) {
-    showToast('公寓描述不能超过 500 字')
-    return
+    formErrors.description = '请输入公寓描述'
+    hasError = true
+  } else if (form.description.trim().length > 500) {
+    formErrors.description = '公寓描述不能超过 500 字'
+    hasError = true
   }
   if (form.district_id === undefined) {
-    showToast('请选择行政区')
-    return
+    formErrors.district_id = '请选择行政区'
+    hasError = true
   }
   if (form.street_id === undefined) {
-    showToast('请选择街道/镇')
-    return
+    formErrors.street_id = '请选择街道/镇'
+    hasError = true
   }
   if (!form.detail_address.trim()) {
-    showToast('请输入详细门牌号')
-    return
+    formErrors.detail_address = '请输入详细门牌号'
+    hasError = true
   }
   if (!form.contact_phone.trim()) {
-    showToast('请输入联系电话')
-    return
-  }
-  if (!/^1[3-9]\d{9}$/.test(form.contact_phone.trim())) {
-    showToast('请输入正确的手机号码')
-    return
+    formErrors.contact_phone = '请输入联系电话'
+    hasError = true
+  } else if (!/^1[3-9]\d{9}$/.test(form.contact_phone.trim())) {
+    formErrors.contact_phone = '请输入正确的手机号码'
+    hasError = true
   }
   if (form.room_types.length === 0) {
-    showToast('请至少添加 1 组房型')
+    formErrors.room_types = '请至少添加 1 组房型'
+    hasError = true
+  }
+
+  if (hasError) {
+    showToast('请完善公寓信息')
     return
   }
 
@@ -455,6 +507,7 @@ onMounted(() => {
           :border="false"
           class="bg-gray-50 rounded-lg"
         />
+        <div v-if="formErrors.name" class="text-danger text-xs mt-1">{{ formErrors.name }}</div>
       </div>
 
       <!-- 总览图上传 -->
@@ -478,6 +531,7 @@ onMounted(() => {
           </template>
         </div>
         <input ref="coverUploader" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" @change="onCoverChange" />
+        <div v-if="formErrors.cover_image" class="text-danger text-xs mt-1">{{ formErrors.cover_image }}</div>
       </div>
 
       <!-- 公寓描述 -->
@@ -493,18 +547,22 @@ onMounted(() => {
           :border="false"
           class="bg-gray-50 rounded-lg"
         />
+        <div v-if="formErrors.description" class="text-danger text-xs mt-1">{{ formErrors.description }}</div>
       </div>
 
       <!-- 所在位置 -->
       <div class="bg-white rounded-xl p-4 space-y-3">
         <div class="text-sm font-bold text-gray-900">所在位置 <span class="text-danger">*</span></div>
         <DistrictCascader v-model="districtModel" />
+        <div v-if="formErrors.district_id" class="text-danger text-xs mt-1">{{ formErrors.district_id }}</div>
+        <div v-if="formErrors.street_id" class="text-danger text-xs mt-1">{{ formErrors.street_id }}</div>
         <van-field
           v-model="form.detail_address"
           placeholder="请输入详细门牌号"
           :border="false"
           class="bg-gray-50 rounded-lg"
         />
+        <div v-if="formErrors.detail_address" class="text-danger text-xs mt-1">{{ formErrors.detail_address }}</div>
       </div>
 
       <!-- 联系电话 -->
@@ -518,6 +576,7 @@ onMounted(() => {
           :border="false"
           class="bg-gray-50 rounded-lg"
         />
+        <div v-if="formErrors.contact_phone" class="text-danger text-xs mt-1">{{ formErrors.contact_phone }}</div>
       </div>
 
       <!-- 房型列表 -->
@@ -558,6 +617,7 @@ onMounted(() => {
         <van-button type="primary" plain block round icon="plus" @click="openAddRoom">
           添加房型
         </van-button>
+        <div v-if="formErrors.room_types" class="text-danger text-xs mt-2">{{ formErrors.room_types }}</div>
       </div>
 
       <!-- 提交按钮 -->
@@ -589,6 +649,7 @@ onMounted(() => {
               :border="false"
               class="bg-gray-50 rounded-lg"
             />
+            <div v-if="roomFormErrors.name" class="text-danger text-xs mt-1">{{ roomFormErrors.name }}</div>
           </div>
 
           <!-- 房型图片 -->
@@ -621,24 +682,28 @@ onMounted(() => {
               </div>
             </div>
             <input ref="roomImageUploader" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" @change="onRoomImageChange" />
+            <div v-if="roomFormErrors.images" class="text-danger text-xs mt-1">{{ roomFormErrors.images }}</div>
           </div>
 
           <!-- 户型 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">户型 <span class="text-danger">*</span></div>
             <DictSelect category="layout_type" v-model="roomForm.layout_type" title="选择户型" placeholder="请选择户型" />
+            <div v-if="roomFormErrors.layout_type" class="text-danger text-xs mt-1">{{ roomFormErrors.layout_type }}</div>
           </div>
 
           <!-- 窗户类型 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">窗户类型 <span class="text-danger">*</span></div>
             <DictSelect category="window_type" v-model="roomForm.window_type" title="选择窗户类型" placeholder="请选择窗户类型" />
+            <div v-if="roomFormErrors.window_type" class="text-danger text-xs mt-1">{{ roomFormErrors.window_type }}</div>
           </div>
 
           <!-- 朝向 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">朝向 <span class="text-danger">*</span></div>
             <DictSelect category="window_orientation" v-model="roomForm.orientation" title="选择朝向" placeholder="请选择朝向" />
+            <div v-if="roomFormErrors.orientation" class="text-danger text-xs mt-1">{{ roomFormErrors.orientation }}</div>
           </div>
 
           <!-- 楼层 -->
@@ -651,6 +716,7 @@ onMounted(() => {
               :border="false"
               class="bg-gray-50 rounded-lg"
             />
+            <div v-if="roomFormErrors.floor" class="text-danger text-xs mt-1">{{ roomFormErrors.floor }}</div>
           </div>
 
           <!-- 设施 -->
@@ -668,6 +734,7 @@ onMounted(() => {
             <div v-if="roomForm.rental_plans.length === 0" class="text-sm text-gray-400 py-4 text-center">
               暂无租金方案，点击上方添加
             </div>
+            <div v-if="roomFormErrors.rental_plans" class="text-danger text-xs mt-1">{{ roomFormErrors.rental_plans }}</div>
             <div v-else class="space-y-3">
               <div
                 v-for="(plan, idx) in roomForm.rental_plans"
@@ -682,22 +749,27 @@ onMounted(() => {
                   <span class="text-sm text-gray-600 w-16 flex-shrink-0">租期</span>
                   <div class="flex-1">
                     <DictSelect category="lease_term" v-model="plan.lease_term" title="选择租期" placeholder="请选择租期" />
+                    <div v-if="rentalPlanErrors[idx]?.lease_term" class="text-danger text-xs mt-1">{{ rentalPlanErrors[idx].lease_term }}</div>
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-sm text-gray-600 w-16 flex-shrink-0">月租金</span>
-                  <van-field
-                    v-model.number="plan.monthly_rent"
-                    type="digit"
-                    placeholder="请输入月租金（元）"
-                    :border="false"
-                    class="flex-1 bg-white rounded-lg"
-                  />
+                  <div class="flex-1">
+                    <van-field
+                      v-model.number="plan.monthly_rent"
+                      type="digit"
+                      placeholder="请输入月租金（元）"
+                      :border="false"
+                      class="flex-1 bg-white rounded-lg"
+                    />
+                    <div v-if="rentalPlanErrors[idx]?.monthly_rent" class="text-danger text-xs mt-1">{{ rentalPlanErrors[idx].monthly_rent }}</div>
+                  </div>
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-sm text-gray-600 w-16 flex-shrink-0">支付方式</span>
                   <div class="flex-1">
                     <DictSelect category="payment_method" v-model="plan.payment_method" title="选择支付方式" placeholder="请选择支付方式" />
+                    <div v-if="rentalPlanErrors[idx]?.payment_method" class="text-danger text-xs mt-1">{{ rentalPlanErrors[idx].payment_method }}</div>
                   </div>
                 </div>
               </div>
