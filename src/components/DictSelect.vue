@@ -84,24 +84,25 @@ function onConfirm({ selectedOptions }: { selectedOptions: { text: string; value
 }
 
 function onMultiConfirm() {
+  emit('update:modelValue', [...tempSelected.value])
   showMultiPicker.value = false
 }
 
 function toggleItem(code: string) {
-  const current = (props.modelValue as string[]) || []
-  const idx = current.indexOf(code)
+  const idx = tempSelected.value.indexOf(code)
   if (idx >= 0) {
-    current.splice(idx, 1)
+    tempSelected.value.splice(idx, 1)
   } else {
-    current.push(code)
+    tempSelected.value.push(code)
   }
-  emit('update:modelValue', [...current])
 }
 
 const showMultiPicker = ref(false)
+const tempSelected = ref<string[]>([])
 
 function openPicker() {
   if (props.multiple) {
+    tempSelected.value = [...((props.modelValue as string[]) || [])]
     showMultiPicker.value = true
   } else {
     showPicker.value = true
@@ -153,7 +154,7 @@ const columns = computed(() =>
           <span class="text-sm text-primary" @click="onMultiConfirm">确定</span>
         </div>
         <div class="flex-1 overflow-y-auto p-3">
-          <van-checkbox-group :model-value="(modelValue as string[]) || []">
+          <van-checkbox-group :model-value="tempSelected">
             <van-cell-group :border="false">
               <van-cell
                 v-for="item in items"
@@ -165,7 +166,7 @@ const columns = computed(() =>
                 <template #right-icon>
                   <van-checkbox
                     :name="item.code"
-                    :model-value="((modelValue as string[]) || []).includes(item.code)"
+                    :model-value="tempSelected.includes(item.code)"
                     @click.stop
                   />
                 </template>
