@@ -33,12 +33,22 @@ function findLabel(code: string) {
   return items.value.find(i => i.code === code)?.label || code
 }
 
+const MAX_DISPLAY_LABELS = 3
+
 function updateLabel() {
   if (props.multiple) {
     const codes = (props.modelValue as string[]) || []
-    selectedLabel.value = codes.length > 0
-      ? codes.map(c => findLabel(c)).join('、')
-      : ''
+    if (codes.length === 0) {
+      selectedLabel.value = ''
+    } else {
+      const displayCodes = codes.slice(0, MAX_DISPLAY_LABELS)
+      const labels = displayCodes.map(c => findLabel(c)).join('、')
+      if (codes.length > MAX_DISPLAY_LABELS) {
+        selectedLabel.value = labels + '...+' + (codes.length - MAX_DISPLAY_LABELS)
+      } else {
+        selectedLabel.value = labels
+      }
+    }
   } else {
     const code = props.modelValue as string
     selectedLabel.value = code ? findLabel(code) : ''
