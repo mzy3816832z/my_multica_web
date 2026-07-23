@@ -9,7 +9,7 @@ export function register(data: { phone: string; sms_code: string; password: stri
   return request.post('/auth/register', data)
 }
 
-export function loginByPassword(data: { phone: string; password: string }): Promise<LoginResult> {
+export function loginByPassword(data: { username: string; password: string }): Promise<LoginResult> {
   return request.post('/auth/login-by-password', data)
 }
 
@@ -27,10 +27,6 @@ export function resetPassword(data: { phone: string; sms_code: string; new_passw
 
 export function changePassword(data: { sms_code: string; new_password: string }): Promise<void> {
   return request.post('/auth/change-password', data)
-}
-
-export function adminLogin(data: { username: string; password: string }): Promise<LoginResult> {
-  return request.post('/auth/admin-login', data)
 }
 
 export function getMe(): Promise<User> {

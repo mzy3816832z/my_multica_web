@@ -61,10 +61,20 @@ function goPage(path: string) {
   router.push(path)
 }
 
-function handleLogout() {
-  authStore.logout()
-  messageStore.reset()
-  router.replace('/login')
+async function handleLogout() {
+  try {
+    await showConfirmDialog({
+      title: '退出登录',
+      message: '确定要退出当前账号吗？',
+    })
+    authStore.logout()
+    messageStore.reset()
+    router.replace('/login')
+  } catch (err: any) {
+    if (err?.message === 'cancel') {
+      // 用户取消
+    }
+  }
 }
 </script>
 
