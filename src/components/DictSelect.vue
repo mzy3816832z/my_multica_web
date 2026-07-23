@@ -157,32 +157,30 @@ const columns = computed(() =>
       />
     </van-popup>
 
-    <van-popup v-model:show="showMultiPicker" position="bottom" round :style="{ maxHeight: '60%' }">
-      <div class="flex flex-col h-full">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <span class="text-base font-bold">{{ title }}</span>
-          <span class="text-sm text-primary" @click="onMultiConfirm">确定</span>
-        </div>
-        <div class="flex-1 overflow-y-auto p-3">
-          <van-checkbox-group :model-value="tempSelected">
-            <van-cell-group :border="false">
-              <van-cell
-                v-for="item in items"
-                :key="item.code"
-                :title="item.label"
-                clickable
-                @click="toggleItem(item.code)"
-              >
-                <template #right-icon>
-                  <van-checkbox
-                    :name="item.code"
-                    :model-value="tempSelected.includes(item.code)"
-                  />
-                </template>
-              </van-cell>
-            </van-cell-group>
-          </van-checkbox-group>
-        </div>
+    <van-popup v-model:show="showMultiPicker" position="bottom" round :style="{ height: '60%', display: 'flex', flexDirection: 'column' }">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+        <span class="text-base font-bold">{{ title }}</span>
+        <span class="text-sm text-primary" @click="onMultiConfirm">确定</span>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3">
+        <van-checkbox-group :model-value="tempSelected">
+          <van-cell-group :border="false">
+            <van-cell
+              v-for="item in items"
+              :key="item.code"
+              :title="item.label"
+              clickable
+              @click="toggleItem(item.code)"
+            >
+              <template #right-icon>
+                <van-checkbox
+                  :name="item.code"
+                  :model-value="tempSelected.includes(item.code)"
+                />
+              </template>
+            </van-cell>
+          </van-cell-group>
+        </van-checkbox-group>
       </div>
     </van-popup>
   </div>
