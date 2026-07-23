@@ -248,15 +248,15 @@ async function onRoomImageChange(e: Event) {
 
   const validFiles = files.filter(file => {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      showToast(`${file.name} 格式不支持，仅支持 jpg/png/webp`)
+      showToast(`${file.name} 格式不支持，已跳过`)
       return false
     }
     if (file.size > 5 * 1024 * 1024) {
-      showToast(`${file.name} 超过 5MB 大小限制`)
+      showToast(`${file.name} 超过 5MB，已跳过`)
       return false
     }
     return true
-  })
+  }).slice(0, remainingSlots)
 
   if (validFiles.length === 0) {
     target.value = ''
@@ -264,24 +264,21 @@ async function onRoomImageChange(e: Event) {
   }
 
   uploadingRoomImage.value = true
+  let successCount = 0
   try {
-    const results = await Promise.allSettled(validFiles.map(file => uploadImage(file)))
-    const uploadedUrls: string[] = []
-    let failCount = 0
-    results.forEach((result) => {
-      if (result.status === 'fulfilled') {
-        uploadedUrls.push(result.value.url)
-      } else {
-        failCount++
+    for (const file of validFiles) {
+      try {
+        const res = await uploadImage(file)
+        roomForm.images.push(res.url)
+        successCount++
+      } catch {
+        showToast(`${file.name} 上传失败`)
       }
-    })
-
-    roomForm.images.push(...uploadedUrls)
-
-    if (failCount > 0) {
-      showToast(`${uploadedUrls.length} 张上传成功，${failCount} 张失败`)
-    } else {
-      showToast(`成功上传 ${uploadedUrls.length} 张图片`)
+    }
+    if (successCount > 0) {
+      showToast(successCount === validFiles.length
+        ? `成功上传 ${successCount} 张图片`
+        : `${successCount} 张上传成功，${validFiles.length - successCount} 张失败`)
     }
   } catch {
     // 错误已在 request 拦截器中 toast
@@ -701,12 +698,12 @@ onMounted(() => {
                 class="w-20 h-20 bg-gray-50 rounded-lg flex flex-col items-center justify-center border border-dashed border-gray-300"
                 @click="triggerRoomImageUpload"
               >
-              <van-icon v-if="uploadingRoomImage" name="loading" class="text-primary animate-spin" />
-              <template v-else>
-                <van-icon name="photograph" class="text-gray-400 text-lg" />
-                <span class="text-xs text-gray-400 mt-1">上传</span>
-              </template>
-              <span v-if="uploadingRoomImage" class="text-xs text-primary mt-1">上传中</span>
+                <van-icon v-if="uploadingRoomImage" name="loading" class="text-primary animate-spin" />
+                <template v-else>
+                  <van-icon name="photograph" class="text-gray-400 text-lg" />
+                  <span class="text-xs text-gray-400 mt-1">上传</span>
+                </template>
+                <span v-if="uploadingRoomImage" class="text-xs text-primary mt-1">上传中</span>
               </div>
             </div>
             <input ref="roomImageUploader" type="file" accept="image/jpeg,image/png,image/webp" multiple class="hidden" @change="onRoomImageChange" />
