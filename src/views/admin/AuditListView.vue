@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/datetime'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -217,7 +218,7 @@ onMounted(() => {
                         变更字段：{{ item.changed_fields.join('、') }}
                       </div>
                       <div class="text-xs text-gray-400 mt-0.5">
-                        提交时间：{{ item.created_at }}
+                        提交时间：{{ formatDateTime(item.created_at) }}
                       </div>
                     </div>
                     <div class="flex items-center justify-between mt-2">

@@ -8,8 +8,8 @@ export interface AuditRecord {
   changed_fields?: string[]
   reject_reason?: string
   reviewer_id?: number
-  created_at: string
-  updated_at: string
+  created_at: number
+  updated_at: number
 }
 
 // 商家审核列表项（精简）
@@ -18,7 +18,7 @@ export interface MerchantAuditItem {
   apartment_id: number
   type: 'first_review' | 'change_review'
   status: 'pending' | 'approved' | 'rejected'
-  created_at: string
+  created_at: number
   apartment_name?: string
   cover_image?: string
   changed_fields?: string[]
@@ -89,8 +89,8 @@ export interface Apartment {
   contact_phone?: string
   status?: string
   min_monthly_rent?: number
-  created_at?: string
-  updated_at?: string
+  created_at?: number
+  updated_at?: number
   is_favorite?: boolean
 }
 
@@ -122,7 +122,7 @@ export interface Message {
   related_apartment_id: number
   related_audit_id?: number
   is_read: boolean
-  created_at: string
+  created_at: number
 }
 
 // 租期租金方案

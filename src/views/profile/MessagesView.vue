@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatFriendlyTime } from '@/utils/datetime'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
@@ -26,14 +27,8 @@ function handleClickMessage(msg: Message) {
   // router.push('/apartments/' + msg.related_apartment_id)
 }
 
-function formatTime(time: string) {
-  const date = new Date(time)
-  const now = new Date()
-  const isToday = date.toDateString() === now.toDateString()
-  if (isToday) {
-    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-  }
-  return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+function formatTime(time: number) {
+  return formatFriendlyTime(time)
 }
 
 onMounted(() => {

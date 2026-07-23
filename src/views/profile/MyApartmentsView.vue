@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/datetime'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showConfirmDialog, Tabs, Tab, PullRefresh, List, Empty, Loading, Image as VanImage, Tag, Button, Icon, NavBar, Cell, Badge } from 'vant'
@@ -291,7 +292,7 @@ onMounted(() => {
                       <van-tag :type="auditStatusType(item.status)" size="medium" round>
                         {{ auditStatusText(item.status) }}
                       </van-tag>
-                      <span class="text-xs text-gray-400">{{ item.created_at }}</span>
+                      <span class="text-xs text-gray-400">{{ formatDateTime(item.created_at) }}</span>
                     </div>
                   </div>
                 </div>
