@@ -1,5 +1,4 @@
-| 07 | feature/merchant-apartments/step-07 | feature/apartment-publish/step-06 | 8fe8f37 | 2026-07-17 | 待合并 |
-| 08 | feature/admin-audit/step-08 | feature/merchant-apartments/step-07 | 49728b2 | 2026-07-17 | 待合并 |# 分支链记录
+# 分支链记录
 
 | step | 分支名 | 基于分支 | 最新commit | 完成日期 | 状态 |
 |------|--------|----------|------------|----------|------|
@@ -9,3 +8,6 @@
 | 04 | feature/apartment-detail/step-04 | feature/apartment-list/step-03 | 129125a | 2026-07-17 | 待合并 |
 | 05 | feature/user-profile/step-05 | feature/apartment-detail/step-04 | 4f1b74f | 2026-07-17 | 待合并 |
 | 06 | feature/apartment-publish/step-06 | feature/user-profile/step-05 | b4519fd | 2026-07-17 | 待合并 |
+| 07 | feature/merchant-apartments/step-07 | feature/apartment-publish/step-06 | 8fe8f37 | 2026-07-17 | 待合并 |
+| 08 | feature/admin-audit/step-08 | feature/merchant-apartments/step-07 | 49728b2 | 2026-07-17 | 待合并 |
+| 09 | feature/timestamp-format/step-09 | feature/admin-audit/step-08 | d8429b7 | 2026-07-23 | 待合并 |
