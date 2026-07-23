@@ -412,8 +412,8 @@ async function onSubmit() {
   if (!form.name.trim()) {
     formErrors.name = '请输入公寓名称'
     hasError = true
-  } else if (form.name.trim().length < 2 || form.name.trim().length > 50) {
-    formErrors.name = '公寓名称需在 2-50 字之间'
+  } else if (form.name.trim().length > 50) {
+    formErrors.name = '公寓名称不能超过 50 字'
     hasError = true
   }
   if (!form.cover_image) {
@@ -513,7 +513,7 @@ onMounted(() => {
         <div class="text-sm font-bold text-gray-900 mb-2">公寓名称 <span class="text-danger">*</span></div>
         <van-field
           v-model="form.name"
-          placeholder="请输入公寓名称（2-50字）"
+          placeholder="请输入公寓名称（最多50字）"
           maxlength="50"
           show-word-limit
           :border="false"

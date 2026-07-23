@@ -30,11 +30,11 @@ export interface CreateApartmentResult {
 }
 
 export function createApartment(payload: CreateApartmentPayload): Promise<CreateApartmentResult> {
-  return request.post('/merchant/apartments', payload)
+  return request.post('/merchant/apartments/', payload)
 }
 
 export function getMerchantApartments(params?: { page?: number; page_size?: number }): Promise<PaginatedData<Apartment>> {
-  return request.get('/merchant/apartments', { params })
+  return request.get('/merchant/apartments/', { params })
 }
 
 export function getMerchantApartmentDetail(id: number): Promise<MerchantApartmentDetail> {
@@ -50,5 +50,5 @@ export function deleteApartment(id: number): Promise<void> {
 }
 
 export function getMerchantAudits(params?: { page?: number; page_size?: number }): Promise<PaginatedData<MerchantAuditItem>> {
-  return request.get('/merchant/audits', { params })
+  return request.get('/merchant/audits/', { params })
 }
