@@ -201,14 +201,14 @@ onMounted(() => {
               >
                 <div class="flex p-3 gap-3">
                   <van-image
-                    :src="(item.submitted_data as any)?.cover_image || ''"
+                    :src="item.cover_image || ''"
                     fit="cover"
                     class="w-24 h-24 rounded-lg flex-shrink-0"
                   />
                   <div class="flex-1 min-w-0 flex flex-col justify-between">
                     <div>
                       <div class="text-sm font-bold text-gray-900 truncate">
-                        {{ (item.submitted_data as any)?.name || '-' }}
+                        {{ item.apartment_name || '-' }}
                       </div>
                       <div class="text-xs text-gray-500 mt-1">
                         {{ auditTypeText(item.type) }}

@@ -8,6 +8,8 @@ export interface AuditRecord {
   changed_fields?: string[]
   reject_reason?: string
   reviewer_id?: number
+  cover_image?: string
+  apartment_name?: string
   created_at: string
   updated_at: string
 }
