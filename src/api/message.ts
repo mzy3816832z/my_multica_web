@@ -2,7 +2,7 @@ import request from '@/utils/request'
 import type { PaginatedData, Message } from '@/types'
 
 export function getMessages(params?: { page?: number; page_size?: number }): Promise<PaginatedData<Message>> {
-  return request.get('/messages', { params })
+  return request.get('/messages/', { params })
 }
 
 export function markMessageRead(id: number): Promise<void> {

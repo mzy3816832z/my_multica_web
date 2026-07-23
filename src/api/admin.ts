@@ -9,7 +9,7 @@ export interface AuditListParams {
 }
 
 export function getAdminAudits(params?: AuditListParams): Promise<PaginatedData<AuditRecord>> {
-  return request.get('/admin/audits', { params })
+  return request.get('/admin/audits/', { params })
 }
 
 export function getAdminAuditDetail(id: number): Promise<AuditRecord> {

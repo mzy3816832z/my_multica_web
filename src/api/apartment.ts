@@ -14,7 +14,7 @@ export interface ApartmentListParams {
 }
 
 export function getApartments(params?: ApartmentListParams): Promise<PaginatedData<Apartment>> {
-  return request.get('/apartments', { params })
+  return request.get('/apartments/', { params })
 }
 
 export function getApartmentDetail(id: number): Promise<Apartment> {
