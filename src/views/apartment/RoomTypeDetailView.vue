@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { getRoomTypeDetail } from '@/api/apartment'
 import { getDicts } from '@/api/dict'
-import { showToast, NavBar, Swipe, SwipeItem, Image as VanImage, Icon, Tag } from 'vant'
 import type { RoomType, RentalPlan, DictItem } from '@/types'
 
 const route = useRoute()
@@ -27,9 +26,9 @@ async function loadDicts() {
       getDicts('payment_method'),
       getDicts('lease_term'),
     ])
-    facilityDicts.value = facilities as unknown as DictItem[]
-    paymentDicts.value = payments as unknown as DictItem[]
-    leaseDicts.value = leases as unknown as DictItem[]
+    facilityDicts.value = facilities
+    paymentDicts.value = payments
+    leaseDicts.value = leases
   } catch {
     // 静默失败，使用原始编码展示
   }
@@ -60,7 +59,7 @@ async function fetchDetail() {
   uiStore.showLoading('加载中...')
   try {
     const res = await getRoomTypeDetail(roomTypeId)
-    roomType.value = res as unknown as RoomType
+    roomType.value = res
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {
@@ -131,7 +130,6 @@ onMounted(() => {
       <div class="mt-2 flex flex-wrap gap-2">
         <van-tag type="primary" size="medium">{{ roomType?.layout_type_label || roomType?.layout_type }}</van-tag>
         <van-tag type="success" size="medium">{{ roomType?.window_type_label || roomType?.window_type }}</van-tag>
-        <van-tag type="warning" size="medium">{{ roomType?.orientation_label || roomType?.orientation }}</van-tag>
         <van-tag size="medium">{{ roomType?.floor }}层</van-tag>
       </div>
     </div>

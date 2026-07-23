@@ -5,7 +5,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import { getApartmentDetail, getRoomTypesByApartment } from '@/api/apartment'
 import { addFavorite, removeFavorite } from '@/api/favorite'
-import { showToast, NavBar, Icon, Image as VanImage, Empty, Tag } from 'vant'
 import type { Apartment, RoomType } from '@/types'
 
 const route = useRoute()
@@ -31,8 +30,8 @@ async function fetchDetail() {
       getApartmentDetail(apartmentId),
       getRoomTypesByApartment(apartmentId),
     ])
-    apartment.value = aptRes as unknown as Apartment
-    roomTypes.value = (roomsRes as unknown as RoomType[]) || []
+    apartment.value = aptRes
+    roomTypes.value = roomsRes || []
   } catch {
     // 错误已在 request 拦截器中 toast
   } finally {
@@ -88,6 +87,7 @@ onMounted(() => {
     >
       <template #right>
         <van-icon
+          v-if="authStore.isTenant"
           :name="apartment?.is_favorite ? 'star' : 'star-o'"
           :class="apartment?.is_favorite ? 'text-warning' : 'text-gray-400'"
           class="text-xl"
@@ -168,7 +168,6 @@ onMounted(() => {
             <div class="mt-1 flex flex-wrap gap-1">
               <van-tag type="primary">{{ room.layout_type_label || room.layout_type }}</van-tag>
               <van-tag type="success">{{ room.window_type_label || room.window_type }}</van-tag>
-              <van-tag type="warning">{{ room.orientation_label || room.orientation }}</van-tag>
               <van-tag>{{ room.floor }}层</van-tag>
             </div>
             <div class="mt-2 flex items-baseline">

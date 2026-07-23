@@ -3,7 +3,6 @@ import { formatFriendlyTime } from '@/utils/datetime'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
-import { NavBar, PullRefresh, List, Empty, Tag } from 'vant'
 import type { Message } from '@/types'
 
 const router = useRouter()

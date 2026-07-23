@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useMessageStore } from '@/stores/message'
-import { Icon, Tag, Cell, Badge, Button } from 'vant'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -24,9 +23,13 @@ const displayName = computed(() => {
 
 // 通用菜单（所有角色）
 const commonMenus = [
-  { title: '我的收藏', path: '/profile/favorites', icon: 'star-o' },
   { title: '我的消息', path: '/profile/messages', icon: 'comment-o', badge: 'unread' },
   { title: '修改密码', path: '/profile/change-password', icon: 'lock' },
+]
+
+// 租客专属菜单
+const tenantMenus = [
+  { title: '我的收藏', path: '/profile/favorites', icon: 'star-o' },
 ]
 
 // 商家专属菜单
@@ -42,6 +45,9 @@ const adminMenus = [
 
 const menus = computed(() => {
   const list = [...commonMenus]
+  if (authStore.isTenant) {
+    list.unshift(...tenantMenus)
+  }
   if (authStore.isLandlord) {
     list.push(...landlordMenus)
   }
@@ -55,10 +61,20 @@ function goPage(path: string) {
   router.push(path)
 }
 
-function handleLogout() {
-  authStore.logout()
-  messageStore.reset()
-  router.replace('/login')
+async function handleLogout() {
+  try {
+    await showConfirmDialog({
+      title: '退出登录',
+      message: '确定要退出当前账号吗？',
+    })
+    authStore.logout()
+    messageStore.reset()
+    router.replace('/login')
+  } catch (err: any) {
+    if (err?.message === 'cancel') {
+      // 用户取消
+    }
+  }
 }
 </script>
 

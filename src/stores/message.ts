@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { getMessages, markMessageRead, getUnreadCount } from '@/api/message'
-import type { PaginatedData, Message } from '@/types'
+import type { Message } from '@/types'
 
 export const useMessageStore = defineStore('message', () => {
   const messages = ref<Message[]>([])
@@ -19,8 +19,7 @@ export const useMessageStore = defineStore('message', () => {
     loading.value = true
     try {
       const currentPage = isRefresh ? 1 : page.value
-      const res = await getMessages({ page: currentPage, page_size: pageSize.value })
-      const data = res as unknown as PaginatedData<Message>
+      const data = await getMessages({ page: currentPage, page_size: pageSize.value })
       if (isRefresh) {
         messages.value = data.items
         page.value = 1
@@ -55,7 +54,7 @@ export const useMessageStore = defineStore('message', () => {
   async function fetchUnreadCount() {
     try {
       const res = await getUnreadCount()
-      unreadCount.value = (res as unknown as { count: number }).count
+      unreadCount.value = res.count
     } catch {
       // 静默失败
     }

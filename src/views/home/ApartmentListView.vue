@@ -2,15 +2,13 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useUiStore } from '@/stores/ui'
 import { getApartments } from '@/api/apartment'
 import { getDistricts, getDicts } from '@/api/dict'
-import { Icon, Image as VanImage, Badge, PullRefresh, List, Empty, FloatingBubble, Popup, Search, Tag, Field, Button } from 'vant'
+import { addFavorite, removeFavorite } from '@/api/favorite'
 import type { Apartment, District, DictItem } from '@/types'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const uiStore = useUiStore()
 
 // ================= 列表数据 =================
 const list = ref<Apartment[]>([])
@@ -42,6 +40,13 @@ const streets = ref<District[]>([])
 const layoutTypes = ref<DictItem[]>([])
 const leaseTerms = ref<DictItem[]>([])
 
+const districtsLoading = ref(false)
+const districtsError = ref('')
+const streetsLoading = ref(false)
+const streetsError = ref('')
+const dictsLoading = ref(false)
+const dictsError = ref('')
+
 const activeFilterCount = computed(() => {
   let count = 0
   if (filter.district_id !== undefined) count++
@@ -54,22 +59,46 @@ const activeFilterCount = computed(() => {
 
 // ================= 加载字典数据 =================
 async function loadDistricts() {
-  const res = await getDistricts({ level: 1 })
-  districts.value = res as unknown as District[]
+  districtsLoading.value = true
+  districtsError.value = ''
+  try {
+    const res = await getDistricts({ level: 1 })
+    districts.value = res
+  } catch {
+    districtsError.value = '加载行政区失败'
+  } finally {
+    districtsLoading.value = false
+  }
 }
 
 async function loadStreets(parentId: number) {
-  const res = await getDistricts({ parent_id: parentId })
-  streets.value = res as unknown as District[]
+  streetsLoading.value = true
+  streetsError.value = ''
+  try {
+    const res = await getDistricts({ parent_id: parentId })
+    streets.value = res
+  } catch {
+    streetsError.value = '加载街道失败'
+  } finally {
+    streetsLoading.value = false
+  }
 }
 
 async function loadDicts() {
-  const [layouts, leases] = await Promise.all([
-    getDicts('layout_type'),
-    getDicts('lease_term'),
-  ])
-  layoutTypes.value = layouts as unknown as DictItem[]
-  leaseTerms.value = leases as unknown as DictItem[]
+  dictsLoading.value = true
+  dictsError.value = ''
+  try {
+    const [layouts, leases] = await Promise.all([
+      getDicts('layout_type'),
+      getDicts('lease_term'),
+    ])
+    layoutTypes.value = layouts
+    leaseTerms.value = leases
+  } catch {
+    dictsError.value = '加载筛选项失败'
+  } finally {
+    dictsLoading.value = false
+  }
 }
 
 watch(() => filter.district_id, (val) => {
@@ -97,8 +126,7 @@ async function fetchList(isRefresh = false) {
       page: currentPage,
       page_size: pageSize.value,
     }
-    const res = await getApartments(params)
-    const data = res as unknown as { items: Apartment[]; total: number; page: number; page_size: number }
+    const data = await getApartments(params)
     if (isRefresh) {
       list.value = data.items
       page.value = 1
@@ -158,6 +186,28 @@ function goDetail(id: number) {
 
 function goCreate() {
   router.push('/profile/apartments/create')
+}
+
+async function toggleFavorite(apartment: Apartment, event: Event) {
+  event.stopPropagation()
+  if (!authStore.isLoggedIn) {
+    showToast('请先登录')
+    router.push({ path: '/login', query: { redirect: '/apartments' } })
+    return
+  }
+  try {
+    if (apartment.is_favorite) {
+      await removeFavorite(apartment.id)
+      apartment.is_favorite = false
+      showToast('已取消收藏')
+    } else {
+      await addFavorite(apartment.id)
+      apartment.is_favorite = true
+      showToast('收藏成功')
+    }
+  } catch {
+    // 错误已在 request 拦截器中 toast
+  }
 }
 
 // ================= 初始化 =================
@@ -225,6 +275,14 @@ onMounted(() => {
               <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
                 ¥{{ item.min_monthly_rent || '?' }}/月起
               </div>
+              <div v-if="authStore.isTenant" class="absolute top-2 right-2">
+                <van-icon
+                  :name="item.is_favorite ? 'star' : 'star-o'"
+                  :class="item.is_favorite ? 'text-warning' : 'text-white'"
+                  class="text-xl drop-shadow"
+                  @click.stop="toggleFavorite(item, $event)"
+                />
+              </div>
             </div>
             <!-- 信息区 -->
             <div class="p-3">
@@ -287,7 +345,13 @@ onMounted(() => {
           <!-- 行政区 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">行政区</div>
-            <div class="flex flex-wrap gap-2">
+            <van-loading v-if="districtsLoading" size="20" class="py-2" />
+            <div v-else-if="districtsError" class="text-sm text-red-500 py-2">
+              {{ districtsError }}
+              <span class="text-primary ml-2 cursor-pointer" @click="loadDistricts">重试</span>
+            </div>
+            <div v-else-if="districts.length === 0" class="text-sm text-gray-400 py-2">暂无行政区数据</div>
+            <div v-else class="flex flex-wrap gap-2">
               <van-tag
                 v-for="d in districts"
                 :key="d.id"
@@ -302,9 +366,12 @@ onMounted(() => {
           </div>
 
           <!-- 街道 -->
-          <div v-if="streets.length > 0">
+          <div v-if="filter.district_id !== undefined || streets.length > 0">
             <div class="text-sm font-bold text-gray-900 mb-2">街道/镇</div>
-            <div class="flex flex-wrap gap-2">
+            <van-loading v-if="streetsLoading" size="20" class="py-2" />
+            <div v-else-if="streetsError" class="text-sm text-red-500 py-2">{{ streetsError }}</div>
+            <div v-else-if="streets.length === 0" class="text-sm text-gray-400 py-2">暂无街道/镇数据</div>
+            <div v-else class="flex flex-wrap gap-2">
               <van-tag
                 v-for="s in streets"
                 :key="s.id"
@@ -321,7 +388,10 @@ onMounted(() => {
           <!-- 户型 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">户型</div>
-            <div class="flex flex-wrap gap-2">
+            <van-loading v-if="dictsLoading" size="20" class="py-2" />
+            <div v-else-if="dictsError" class="text-sm text-red-500 py-2">{{ dictsError }}</div>
+            <div v-else-if="layoutTypes.length === 0" class="text-sm text-gray-400 py-2">暂无户型数据</div>
+            <div v-else class="flex flex-wrap gap-2">
               <van-tag
                 v-for="l in layoutTypes"
                 :key="l.code"
@@ -338,7 +408,10 @@ onMounted(() => {
           <!-- 租期 -->
           <div>
             <div class="text-sm font-bold text-gray-900 mb-2">租期</div>
-            <div class="flex flex-wrap gap-2">
+            <van-loading v-if="dictsLoading" size="20" class="py-2" />
+            <div v-else-if="dictsError" class="text-sm text-red-500 py-2">{{ dictsError }}</div>
+            <div v-else-if="leaseTerms.length === 0" class="text-sm text-gray-400 py-2">暂无租期数据</div>
+            <div v-else class="flex flex-wrap gap-2">
               <van-tag
                 v-for="t in leaseTerms"
                 :key="t.code"
@@ -398,6 +471,14 @@ onMounted(() => {
 
 .empty-state {
   padding-top: 20vh;
+}
+
+.text-warning {
+  color: $warning;
+}
+
+.drop-shadow {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 :deep(.van-search) {
