@@ -64,15 +64,6 @@ watch(() => form.detail_address, () => { delete formErrors.detail_address })
 watch(() => form.contact_phone, () => { delete formErrors.contact_phone })
 watch(() => form.room_types.length, () => { if (form.room_types.length > 0) delete formErrors.room_types })
 
-// 房型表单字段变更时清除对应错误
-watch(() => roomForm.name, () => { delete roomFormErrors.name })
-watch(() => roomForm.images.length, () => { if (roomForm.images.length > 0) delete roomFormErrors.images })
-watch(() => roomForm.layout_type, () => { delete roomFormErrors.layout_type })
-watch(() => roomForm.window_type, () => { delete roomFormErrors.window_type })
-watch(() => roomForm.orientation, () => { delete roomFormErrors.orientation })
-watch(() => roomForm.floor, () => { delete roomFormErrors.floor })
-watch(() => roomForm.rental_plans.length, () => { if (roomForm.rental_plans.length > 0) delete roomFormErrors.rental_plans })
-
 // ================= 行政区级联值绑定 =================
 const districtValue = ref<{ district_id?: number; street_id?: number }>({
   district_id: form.district_id,
@@ -138,6 +129,15 @@ const roomForm = reactive<RoomTypeFormItem>({
   floor: undefined,
   rental_plans: [],
 })
+
+// 房型表单字段变更时清除对应错误
+watch(() => roomForm.name, () => { delete roomFormErrors.name })
+watch(() => roomForm.images.length, () => { if (roomForm.images.length > 0) delete roomFormErrors.images })
+watch(() => roomForm.layout_type, () => { delete roomFormErrors.layout_type })
+watch(() => roomForm.window_type, () => { delete roomFormErrors.window_type })
+watch(() => roomForm.orientation, () => { delete roomFormErrors.orientation })
+watch(() => roomForm.floor, () => { delete roomFormErrors.floor })
+watch(() => roomForm.rental_plans.length, () => { if (roomForm.rental_plans.length > 0) delete roomFormErrors.rental_plans })
 
 const roomImageUploader = ref<HTMLInputElement | null>(null)
 const uploadingRoomImage = ref(false)
