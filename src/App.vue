@@ -35,8 +35,10 @@ const activeTab = computed(() => {
       <van-tabbar-item icon="user-o" to="/profile">我的</van-tabbar-item>
     </van-tabbar>
     <!-- 全局 Loading -->
-    <van-overlay :show="uiStore.loading" class="flex items-center justify-center">
-      <van-loading :text="uiStore.loadingText" vertical />
+    <van-overlay :show="uiStore.loading" :z-index="2000" class="global-loading" lock-scroll>
+      <div class="loading-content">
+        <van-loading :text="uiStore.loadingText" vertical color="#fff" text-color="#fff" />
+      </div>
     </van-overlay>
   </div>
 </template>
@@ -47,5 +49,18 @@ const activeTab = computed(() => {
   margin: 0 auto;
   min-height: 100vh;
   background-color: #f7f8fa;
+}
+
+.global-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 </style>
