@@ -15,7 +15,6 @@ export interface CreateApartmentPayload {
     facilities: string[]
     layout_type: string
     window_type: string
-    orientation: string
     floor: number
     rental_plans: {
       lease_term: string

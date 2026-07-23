@@ -130,7 +130,6 @@ onMounted(() => {
       <div class="mt-2 flex flex-wrap gap-2">
         <van-tag type="primary" size="medium">{{ roomType?.layout_type_label || roomType?.layout_type }}</van-tag>
         <van-tag type="success" size="medium">{{ roomType?.window_type_label || roomType?.window_type }}</van-tag>
-        <van-tag type="warning" size="medium">{{ roomType?.orientation_label || roomType?.orientation }}</van-tag>
         <van-tag size="medium">{{ roomType?.floor }}层</van-tag>
       </div>
     </div>

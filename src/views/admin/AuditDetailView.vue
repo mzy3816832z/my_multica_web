@@ -235,9 +235,6 @@ onMounted(() => {
               <span class="text-gray-500">窗户：</span>{{ room.window_type_label || room.window_type || '-' }}
             </div>
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
-              <span class="text-gray-500">朝向：</span>{{ room.orientation_label || room.orientation || '-' }}
-            </div>
-            <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
               <span class="text-gray-500">楼层：</span>{{ room.floor ?? '-' }}
             </div>
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">

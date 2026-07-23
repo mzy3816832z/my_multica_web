@@ -33,7 +33,6 @@ interface RoomTypeFormItem {
   facilities: string[]
   layout_type: string
   window_type: string
-  orientation: string
   floor: number | undefined
   rental_plans: RentalPlanFormItem[]
 }
@@ -102,7 +101,6 @@ async function loadApartmentDetail() {
       facilities: [...r.facilities],
       layout_type: r.layout_type,
       window_type: r.window_type,
-      orientation: r.orientation,
       floor: r.floor,
       rental_plans: (r.rental_plans || []).map((p: RentalPlan) => ({
         lease_term: p.lease_term,
@@ -167,7 +165,6 @@ const roomForm = reactive<RoomTypeFormItem>({
   facilities: [],
   layout_type: '',
   window_type: '',
-  orientation: '',
   floor: undefined,
   rental_plans: [],
 })
@@ -177,7 +174,6 @@ watch(() => roomForm.name, () => { delete roomFormErrors.name })
 watch(() => roomForm.images.length, () => { if (roomForm.images.length > 0) delete roomFormErrors.images })
 watch(() => roomForm.layout_type, () => { delete roomFormErrors.layout_type })
 watch(() => roomForm.window_type, () => { delete roomFormErrors.window_type })
-watch(() => roomForm.orientation, () => { delete roomFormErrors.orientation })
 watch(() => roomForm.floor, () => { delete roomFormErrors.floor })
 watch(() => roomForm.rental_plans.length, () => { if (roomForm.rental_plans.length > 0) delete roomFormErrors.rental_plans })
 
@@ -201,7 +197,6 @@ function openEditRoom(index: number) {
     facilities: [...room.facilities],
     layout_type: room.layout_type,
     window_type: room.window_type,
-    orientation: room.orientation,
     floor: room.floor,
     rental_plans: room.rental_plans.map(p => ({ ...p })),
   })
@@ -214,7 +209,6 @@ function resetRoomForm() {
   roomForm.facilities = []
   roomForm.layout_type = ''
   roomForm.window_type = ''
-  roomForm.orientation = ''
   roomForm.floor = undefined
   roomForm.rental_plans = []
   Object.keys(roomFormErrors).forEach(k => delete roomFormErrors[k])
@@ -327,10 +321,6 @@ function saveRoom() {
     roomFormErrors.window_type = '请选择窗户类型'
     hasError = true
   }
-  if (!roomForm.orientation) {
-    roomFormErrors.orientation = '请选择朝向'
-    hasError = true
-  }
   if (roomForm.floor === undefined || roomForm.floor === null) {
     roomFormErrors.floor = '请输入楼层'
     hasError = true
@@ -369,7 +359,6 @@ function saveRoom() {
     facilities: [...roomForm.facilities],
     layout_type: roomForm.layout_type,
     window_type: roomForm.window_type,
-    orientation: roomForm.orientation,
     floor: Number(roomForm.floor),
     rental_plans: roomForm.rental_plans.map(p => ({
       lease_term: p.lease_term,
@@ -483,7 +472,6 @@ async function onSubmit() {
         facilities: r.facilities,
         layout_type: r.layout_type,
         window_type: r.window_type,
-        orientation: r.orientation,
         floor: r.floor as number,
         rental_plans: r.rental_plans.map(p => ({
           lease_term: p.lease_term,
@@ -722,13 +710,6 @@ onMounted(() => {
             <div class="text-sm font-bold text-gray-900 mb-2">窗户类型 <span class="text-danger">*</span></div>
             <DictSelect category="window_type" v-model="roomForm.window_type" title="选择窗户类型" placeholder="请选择窗户类型" />
             <div v-if="roomFormErrors.window_type" class="text-danger text-xs mt-1">{{ roomFormErrors.window_type }}</div>
-          </div>
-
-          <!-- 朝向 -->
-          <div>
-            <div class="text-sm font-bold text-gray-900 mb-2">朝向 <span class="text-danger">*</span></div>
-            <DictSelect category="window_orientation" v-model="roomForm.orientation" title="选择朝向" placeholder="请选择朝向" />
-            <div v-if="roomFormErrors.orientation" class="text-danger text-xs mt-1">{{ roomFormErrors.orientation }}</div>
           </div>
 
           <!-- 楼层 -->
