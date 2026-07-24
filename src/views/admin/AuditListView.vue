@@ -45,7 +45,7 @@ async function loadList(isRefresh = false) {
       type: tabTypes[activeTab.value],
     }
     if (keyword.value.trim()) {
-      params.keyword = keyword.value.trim()
+      params.name = keyword.value.trim()
     }
     const data = await getAdminAudits(params)
     if (isRefresh) {
