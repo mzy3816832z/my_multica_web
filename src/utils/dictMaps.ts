@@ -2,22 +2,19 @@
 // 用于后端未返回 label 时的兜底展示
 
 export const layoutTypeMap: Record<string, string> = {
-  studio: '单间',
+  studio: '一室',
   one_bedroom: '一室一厅',
   two_bedroom: '两室一厅',
+  two_bedroom_2: '两室两厅',
   three_bedroom: '三室一厅',
-  four_bedroom: '四室一厅',
-  shared: '合租',
-  dormitory: '宿舍',
-  other: '其他',
+  three_bedroom_2: '三室两厅',
+  loft: 'LOFT',
+  duplex: '复式',
 }
 
 export const windowTypeMap: Record<string, string> = {
   inner: '内窗',
   outer: '外窗',
-  none: '无窗',
-  bay: '飘窗',
-  floor_to_ceiling: '落地窗',
 }
 
 export const orientationMap: Record<string, string> = {
@@ -26,8 +23,8 @@ export const orientationMap: Record<string, string> = {
   west: '西',
   north: '北',
   southeast: '东南',
-  northeast: '东北',
   southwest: '西南',
+  northeast: '东北',
   northwest: '西北',
 }
 
@@ -36,36 +33,34 @@ export const facilityMap: Record<string, string> = {
   washing_machine: '洗衣机',
   refrigerator: '冰箱',
   water_heater: '热水器',
+  wifi: 'WiFi',
+  tv: '电视',
+  sofa: '沙发',
   bed: '床',
   wardrobe: '衣柜',
   desk: '书桌',
-  chair: '椅子',
-  sofa: '沙发',
-  tv: '电视',
-  wifi: 'WiFi',
-  balcony: '阳台',
   kitchen: '厨房',
-  bathroom: '独立卫生间',
+  balcony: '阳台',
   elevator: '电梯',
   parking: '停车位',
-  smart_lock: '智能门锁',
-  heating: '暖气',
+  gym: '健身房',
 }
 
 export const leaseTermMap: Record<string, string> = {
   '1_month': '1个月',
   '3_months': '3个月',
-  '6_months': '6个月',
+  '6_months': '半年',
   '1_year': '1年',
+  '18_months': '18个月',
   '2_years': '2年',
 }
 
 export const paymentMethodMap: Record<string, string> = {
   pay_1_deposit_1: '押一付一',
-  pay_3_deposit_1: '押一付三',
-  pay_6_deposit_1: '押一付六',
-  pay_12_deposit_1: '押一付十二',
-  no_deposit: '无押金',
+  pay_1_deposit_3: '押一付三',
+  pay_1_deposit_6: '押一付六',
+  pay_1_deposit_12: '押一付年',
+  no_deposit: '免押金',
 }
 
 // 审核类型映射
