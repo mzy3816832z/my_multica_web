@@ -68,6 +68,19 @@ export const paymentMethodMap: Record<string, string> = {
   no_deposit: '无押金',
 }
 
+// 审核类型映射
+export const auditTypeMap: Record<string, string> = {
+  first_review: '提交审核',
+  change_review: '变更审核',
+}
+
+// 审核状态映射
+export const auditStatusMap: Record<string, string> = {
+  pending: '待审核',
+  approved: '已通过',
+  rejected: '已驳回',
+}
+
 // 通用映射查找函数
 export function mapDict(
   value: string | undefined,

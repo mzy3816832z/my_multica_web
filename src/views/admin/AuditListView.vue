@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/datetime'
+import { auditTypeMap, auditStatusMap } from '@/utils/dictMaps'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -124,16 +125,11 @@ async function onQuickReject(id: number) {
 }
 
 function auditTypeText(type?: string) {
-  return type === 'first_review' ? '提交审核' : '变更审核'
+  return auditTypeMap[type || ''] || type || '-'
 }
 
 function auditStatusText(status?: string) {
-  const map: Record<string, string> = {
-    pending: '待审核',
-    approved: '已通过',
-    rejected: '已驳回',
-  }
-  return map[status || ''] || status || '-'
+  return auditStatusMap[status || ''] || status || '-'
 }
 
 function auditStatusType(status?: string): 'primary' | 'success' | 'warning' | 'danger' | 'default' {
