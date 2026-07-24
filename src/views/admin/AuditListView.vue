@@ -75,6 +75,10 @@ function onSearch() {
   loadList(true)
 }
 
+function goBack() {
+  router.back()
+}
+
 function goDetail(id: number) {
   router.push('/admin/audits/' + id)
 }
@@ -148,7 +152,7 @@ onMounted(() => {
 
 <template>
   <div class="audit-list-page">
-    <van-nav-bar title="审核管理" fixed placeholder />
+    <van-nav-bar title="审核管理" left-arrow @click-left="goBack" fixed placeholder />
 
     <!-- 搜索栏 -->
     <div class="sticky top-[46px] z-10 bg-bg">
