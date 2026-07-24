@@ -244,7 +244,10 @@ onMounted(() => {
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
               <span class="text-gray-500">窗户：</span>{{ mapDict(room.window_type_label || room.window_type, windowTypeMap) }}
             </div>
-            <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
+            <div
+              v-if="room.orientation"
+              :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'"
+            >
               <span class="text-gray-500">朝向：</span>{{ mapDict(room.orientation, orientationMap) }}
             </div>
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
