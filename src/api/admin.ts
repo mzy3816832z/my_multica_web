@@ -21,5 +21,5 @@ export function approveAudit(id: number): Promise<void> {
 }
 
 export function rejectAudit(id: number, reason: string): Promise<void> {
-  return request.post('/admin/audits/' + id + '/reject/', { reason })
+  return request.post('/admin/audits/' + id + '/reject/', { reject_reason: reason })
 }
