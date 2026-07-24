@@ -13,13 +13,13 @@ export function getAdminAudits(params?: AuditListParams): Promise<PaginatedData<
 }
 
 export function getAdminAuditDetail(id: number): Promise<AuditRecord> {
-  return request.get('/admin/audits/' + id)
+  return request.get('/admin/audits/' + id + '/')
 }
 
 export function approveAudit(id: number): Promise<void> {
-  return request.post('/admin/audits/' + id + '/approve')
+  return request.post('/admin/audits/' + id + '/approve/')
 }
 
 export function rejectAudit(id: number, reason: string): Promise<void> {
-  return request.post('/admin/audits/' + id + '/reject', { reason })
+  return request.post('/admin/audits/' + id + '/reject/', { reason })
 }
