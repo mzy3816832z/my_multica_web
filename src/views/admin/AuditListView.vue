@@ -207,7 +207,6 @@ onMounted(() => {
                       <van-tag :type="auditStatusType(item.status)" size="medium" round>
                         {{ auditStatusText(item.status) }}
                       </van-tag>
-                      <span v-if="item.status === 'pending'" class="text-xs text-gray-400">待处理</span>
                     </div>
                   </div>
                 </div>
