@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/datetime'
+import {
+  layoutTypeMap,
+  windowTypeMap,
+  orientationMap,
+  facilityMap,
+  leaseTermMap,
+  paymentMethodMap,
+  mapDict,
+  mapFacilities,
+} from '@/utils/dictMaps'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -230,16 +240,19 @@ onMounted(() => {
           <div class="text-sm font-bold mb-2">房型 {{ (idx as number) + 1 }}：{{ room.name || '-' }}</div>
           <div class="space-y-1 text-xs">
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
-              <span class="text-gray-500">布局：</span>{{ room.layout_type_label || room.layout_type || '-' }}
+              <span class="text-gray-500">布局：</span>{{ mapDict(room.layout_type_label || room.layout_type, layoutTypeMap) }}
             </div>
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
-              <span class="text-gray-500">窗户：</span>{{ room.window_type_label || room.window_type || '-' }}
+              <span class="text-gray-500">窗户：</span>{{ mapDict(room.window_type_label || room.window_type, windowTypeMap) }}
+            </div>
+            <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
+              <span class="text-gray-500">朝向：</span>{{ mapDict(room.orientation, orientationMap) }}
             </div>
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
               <span class="text-gray-500">楼层：</span>{{ room.floor ?? '-' }}
             </div>
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
-              <span class="text-gray-500">设施：</span>{{ room.facilities?.join('、') || '-' }}
+              <span class="text-gray-500">设施：</span>{{ mapFacilities(room.facilities) }}
             </div>
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
               <span class="text-gray-500">租金方案：</span>
@@ -248,7 +261,7 @@ onMounted(() => {
                 :key="pidx"
                 class="mr-2"
               >
-                {{ plan.lease_term_label || plan.lease_term || '-' }} / {{ plan.monthly_rent }}元 / {{ plan.payment_method_label || plan.payment_method || '-' }}
+                {{ mapDict(plan.lease_term_label || plan.lease_term, leaseTermMap) }} / {{ plan.monthly_rent }}元 / {{ mapDict(plan.payment_method_label || plan.payment_method, paymentMethodMap) }}
               </span>
             </div>
           </div>
