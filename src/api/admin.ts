@@ -4,6 +4,7 @@ import type { PaginatedData, AuditRecord } from '@/types'
 export interface AuditListParams {
   type?: 'first_review' | 'change_review'
   status?: 'pending' | 'approved' | 'rejected'
+  name?: string
   page?: number
   page_size?: number
 }
