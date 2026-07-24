@@ -24,6 +24,11 @@ const PAGE_SIZE = 10
 
 const keyword = ref('')
 
+// 驳回弹框相关状态
+const showRejectForm = ref(false)
+const rejectReason = ref('')
+const rejectTargetId = ref<number | null>(null)
+
 // 加载列表
 async function loadList(isRefresh = false) {
   if (isRefresh) {
@@ -104,24 +109,40 @@ async function onQuickApprove(id: number) {
   }
 }
 
-// 快捷驳回
-async function onQuickReject(id: number) {
+// 显示驳回弹框
+function onShowReject(id: number) {
+  rejectTargetId.value = id
+  rejectReason.value = ''
+  showRejectForm.value = true
+}
+
+// 确认驳回
+async function onConfirmReject() {
+  if (!rejectReason.value.trim()) {
+    showToast('请填写驳回原因')
+    return
+  }
+  if (!rejectTargetId.value) return
   try {
-    await showConfirmDialog({
-      title: '确认驳回',
-      message: '驳回后该房源将退回商家修改，确定继续吗？',
-    })
     uiStore.showLoading('处理中...')
-    await rejectAudit(id, '不符合平台规范')
+    await rejectAudit(rejectTargetId.value, rejectReason.value.trim())
     showToast('已驳回')
+    showRejectForm.value = false
+    rejectReason.value = ''
+    rejectTargetId.value = null
     loadList(true)
-  } catch (err: any) {
-    if (err?.message === 'cancel') {
-      // 用户取消
-    }
+  } catch {
+    // 错误已在 request 拦截器中 toast
   } finally {
     uiStore.hideLoading()
   }
+}
+
+// 取消驳回
+function onCancelReject() {
+  showRejectForm.value = false
+  rejectReason.value = ''
+  rejectTargetId.value = null
 }
 
 function auditTypeText(type?: string) {
@@ -223,7 +244,7 @@ onMounted(() => {
                   <div class="w-px bg-gray-100" />
                   <div
                     class="flex-1 py-2.5 text-center text-sm text-danger flex items-center justify-center gap-1"
-                    @click.stop="onQuickReject(item.id)"
+                    @click.stop="onShowReject(item.id)"
                   >
                     <van-icon name="close" />
                     <span>驳回</span>
@@ -235,6 +256,25 @@ onMounted(() => {
         </van-pull-refresh>
       </van-tab>
     </van-tabs>
+    <!-- 驳回弹框 -->
+    <van-popup v-model:show="showRejectForm" position="bottom" round :style="{ maxHeight: '60%' }">
+      <div class="p-4">
+        <div class="text-sm font-bold mb-2">驳回原因（必填）</div>
+        <van-field
+          v-model="rejectReason"
+          type="textarea"
+          placeholder="请填写驳回原因，商家将收到此消息..."
+          rows="3"
+          maxlength="200"
+          show-word-limit
+          class="mb-3"
+        />
+        <div class="flex gap-3">
+          <van-button block round plain class="flex-1" @click="onCancelReject">取消</van-button>
+          <van-button type="danger" block round class="flex-1" @click="onConfirmReject">确认驳回</van-button>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
