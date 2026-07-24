@@ -61,11 +61,11 @@ export const leaseTermMap: Record<string, string> = {
 }
 
 export const paymentMethodMap: Record<string, string> = {
-  no_deposit: '押一付一',
-  one_deposit: '押一付三',
-  two_deposit: '押二付一',
-  half_year: '半年付',
-  yearly: '年付',
+  pay_1_deposit_1: '押一付一',
+  pay_3_deposit_1: '押一付三',
+  pay_6_deposit_1: '押一付六',
+  pay_12_deposit_1: '押一付十二',
+  no_deposit: '无押金',
 }
 
 // 通用映射查找函数
