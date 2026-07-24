@@ -15,7 +15,6 @@ export interface CreateApartmentPayload {
     facilities: string[]
     layout_type: string
     window_type: string
-    orientation: string
     floor: number
     rental_plans: {
       lease_term: string
@@ -25,26 +24,31 @@ export interface CreateApartmentPayload {
   }[]
 }
 
-export function createApartment(payload: CreateApartmentPayload) {
-  return request.post<{ apartment_id: number; audit_id: number }>('/merchant/apartments', payload)
+export interface CreateApartmentResult {
+  apartment_id: number
+  audit_id: number
 }
 
-export function getMerchantApartments(params?: { page?: number; page_size?: number }) {
-  return request.get<{ items: Apartment[]; total: number; page: number; page_size: number }>('/merchant/apartments', { params })
+export function createApartment(payload: CreateApartmentPayload): Promise<CreateApartmentResult> {
+  return request.post('/merchant/apartments/', payload)
 }
 
-export function getMerchantApartmentDetail(id: number) {
-  return request.get<MerchantApartmentDetail>('/merchant/apartments/' + id)
+export function getMerchantApartments(params?: { page?: number; page_size?: number }): Promise<PaginatedData<Apartment>> {
+  return request.get('/merchant/apartments/', { params })
 }
 
-export function updateApartment(id: number, payload: CreateApartmentPayload) {
+export function getMerchantApartmentDetail(id: number): Promise<MerchantApartmentDetail> {
+  return request.get('/merchant/apartments/' + id)
+}
+
+export function updateApartment(id: number, payload: CreateApartmentPayload): Promise<void> {
   return request.put('/merchant/apartments/' + id, payload)
 }
 
-export function deleteApartment(id: number) {
+export function deleteApartment(id: number): Promise<void> {
   return request.delete('/merchant/apartments/' + id)
 }
 
-export function getMerchantAudits(params?: { page?: number; page_size?: number }) {
-  return request.get<PaginatedData<MerchantAuditItem>>('/merchant/audits', { params })
+export function getMerchantAudits(params?: { page?: number; page_size?: number }): Promise<PaginatedData<MerchantAuditItem>> {
+  return request.get('/merchant/audits/', { params })
 }

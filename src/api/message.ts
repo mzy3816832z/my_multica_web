@@ -1,14 +1,18 @@
 import request from '@/utils/request'
 import type { PaginatedData, Message } from '@/types'
 
-export function getMessages(params?: { page?: number; page_size?: number }) {
-  return request.get<PaginatedData<Message>>('/messages', { params })
+export function getMessages(params?: { page?: number; page_size?: number }): Promise<PaginatedData<Message>> {
+  return request.get('/messages/', { params })
 }
 
-export function markMessageRead(id: number) {
+export function markMessageRead(id: number): Promise<void> {
   return request.post('/messages/' + id + '/read', {})
 }
 
-export function getUnreadCount() {
-  return request.get<{ count: number }>('/messages/unread-count')
+export interface UnreadCountResult {
+  count: number
+}
+
+export function getUnreadCount(): Promise<UnreadCountResult> {
+  return request.get('/messages/unread-count')
 }

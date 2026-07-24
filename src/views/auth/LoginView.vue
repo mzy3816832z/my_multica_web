@@ -3,7 +3,6 @@ import { ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { loginByPassword, loginByCode, sendSmsCode } from '@/api/auth'
-import { Form, Field, Icon, Button } from 'vant'
 import type { LoginResult } from '@/types'
 
 const router = useRouter()
@@ -25,11 +24,20 @@ const smsTimer = ref<ReturnType<typeof setInterval> | null>(null)
 
 const phoneValid = computed(() => /^1[3-9]\d{9}$/.test(form.phone))
 const canSendSms = computed(() => phoneValid.value && smsCountdown.value === 0)
-const canSubmit = computed(() => {
-  if (!phoneValid.value) return false
-  if (mode.value === 'password') {
-    return form.password.length >= 6
+const phoneRules = computed(() => {
+  if (mode.value === 'code') {
+    return [
+      { required: true, message: '请输入手机号' },
+      { pattern: /^1[3-9]\d{9}$/, message: '手机号格式错误' },
+    ]
   }
+  return [{ required: true, message: '请输入账号' }]
+})
+const canSubmit = computed(() => {
+  if (mode.value === 'password') {
+    return form.phone.trim().length > 0 && form.password.length >= 6
+  }
+  if (!phoneValid.value) return false
   return form.smsCode.length === 6
 })
 
@@ -54,6 +62,12 @@ function handleLoginSuccess(res: LoginResult) {
   authStore.setToken(res.access_token, res.refresh_token)
   authStore.setUser(res.user)
 
+  // 管理员登录后直接跳转审核管理
+  if (res.user.role === 'admin') {
+    router.replace('/admin/audits')
+    return
+  }
+
   // 首次登录无角色 → 强制身份选择
   if (!res.user.role) {
     const redirect = route.query.redirect as string
@@ -69,9 +83,12 @@ async function onSubmit() {
   if (!canSubmit.value) return
   loading.value = true
   try {
-    const res = mode.value === 'password'
-      ? await loginByPassword({ phone: form.phone, password: form.password })
-      : await loginByCode({ phone: form.phone, sms_code: form.smsCode })
+    let res: LoginResult
+    if (mode.value === 'password') {
+      res = await loginByPassword({ username: form.phone, password: form.password })
+    } else {
+      res = await loginByCode({ phone: form.phone, sms_code: form.smsCode })
+    }
     handleLoginSuccess(res)
   } catch {
     // 错误已在 request 拦截器中 toast
@@ -113,13 +130,11 @@ async function onSubmit() {
       </div>
 
       <van-form @submit="onSubmit">
-        <!-- 手机号 -->
+        <!-- 账号 -->
         <van-field
           v-model="form.phone"
-          type="tel"
-          maxlength="11"
-          placeholder="请输入手机号"
-          :rules="[{ required: true, message: '请输入手机号' }, { pattern: /^1[3-9]\d{9}$/, message: '手机号格式错误' }]"
+          :placeholder="mode === 'password' ? '请输入手机号或管理员账号' : '请输入手机号'"
+          :rules="phoneRules"
           class="mb-3"
         >
           <template #left-icon>
@@ -143,7 +158,7 @@ async function onSubmit() {
 
         <!-- 验证码 -->
         <van-field
-          v-else
+          v-if="mode === 'code'"
           v-model="form.smsCode"
           type="digit"
           maxlength="6"

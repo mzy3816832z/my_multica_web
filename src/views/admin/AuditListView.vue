@@ -1,24 +1,8 @@
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/datetime'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  showToast,
-  showConfirmDialog,
-  Tabs,
-  Tab,
-  PullRefresh,
-  List,
-  Empty,
-  Loading,
-  Image as VanImage,
-  Tag,
-  Button,
-  Icon,
-  NavBar,
-  Cell,
-  Badge,
-  Search,
-} from 'vant'
+
 import { getAdminAudits, approveAudit, rejectAudit } from '@/api/admin'
 import { useUiStore } from '@/stores/ui'
 import type { AuditRecord } from '@/types'
@@ -57,8 +41,7 @@ async function loadList(isRefresh = false) {
     if (keyword.value.trim()) {
       params.keyword = keyword.value.trim()
     }
-    const res = await getAdminAudits(params)
-    const data = res as unknown as { items: AuditRecord[]; total: number; page: number; page_size: number }
+    const data = await getAdminAudits(params)
     if (isRefresh) {
       list.value = data.items
     } else {
@@ -217,7 +200,7 @@ onMounted(() => {
                         变更字段：{{ item.changed_fields.join('、') }}
                       </div>
                       <div class="text-xs text-gray-400 mt-0.5">
-                        提交时间：{{ item.created_at }}
+                        提交时间：{{ formatDateTime(item.created_at) }}
                       </div>
                     </div>
                     <div class="flex items-center justify-between mt-2">

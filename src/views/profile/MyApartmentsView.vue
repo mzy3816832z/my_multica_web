@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/datetime'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast, showConfirmDialog, Tabs, Tab, PullRefresh, List, Empty, Loading, Image as VanImage, Tag, Button, Icon, NavBar, Cell, Badge } from 'vant'
 import { getMerchantApartments, getMerchantAudits, deleteApartment } from '@/api/merchant'
 import { useUiStore } from '@/stores/ui'
 import type { Apartment, MerchantAuditItem } from '@/types'
@@ -36,8 +36,7 @@ async function loadPublishedList(isRefresh = false) {
 
   publishedLoading.value = true
   try {
-    const res = await getMerchantApartments({ page: publishedPage.value, page_size: PAGE_SIZE })
-    const data = res as unknown as { items: Apartment[]; total: number; page: number; page_size: number }
+    const data = await getMerchantApartments({ page: publishedPage.value, page_size: PAGE_SIZE })
     if (isRefresh) {
       publishedList.value = data.items
     } else {
@@ -55,7 +54,7 @@ async function loadPublishedList(isRefresh = false) {
   }
 }
 
-// 加载审核中列表
+// 加载审核中列表（后端按 created_at 倒序返回）
 async function loadAuditList(isRefresh = false) {
   if (isRefresh) {
     auditPage.value = 1
@@ -65,8 +64,7 @@ async function loadAuditList(isRefresh = false) {
 
   auditLoading.value = true
   try {
-    const res = await getMerchantAudits({ page: auditPage.value, page_size: PAGE_SIZE })
-    const data = res as unknown as { items: MerchantAuditItem[]; total: number; page: number; page_size: number }
+    const data = await getMerchantAudits({ page: auditPage.value, page_size: PAGE_SIZE })
     if (isRefresh) {
       auditList.value = data.items
     } else {
@@ -291,7 +289,7 @@ onMounted(() => {
                       <van-tag :type="auditStatusType(item.status)" size="medium" round>
                         {{ auditStatusText(item.status) }}
                       </van-tag>
-                      <span class="text-xs text-gray-400">{{ item.created_at }}</span>
+                      <span class="text-xs text-gray-400">{{ formatDateTime(item.created_at) }}</span>
                     </div>
                   </div>
                 </div>
