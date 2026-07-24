@@ -254,14 +254,16 @@ onMounted(() => {
               <span class="text-gray-500">设施：</span>{{ mapFacilities(room.facilities) }}
             </div>
             <div :class="isChangedField('room_types') ? 'text-danger font-bold' : 'text-gray-700'">
-              <span class="text-gray-500">租金方案：</span>
-              <span
+              <div class="text-gray-500 mb-1">租金方案：</div>
+              <div
                 v-for="(plan, pidx) in room.rental_plans"
                 :key="pidx"
-                class="mr-2"
+                class="pl-2 mb-2 pb-2 border-b border-gray-100 last:border-b-0"
               >
-                {{ mapDict(plan.lease_term_label || plan.lease_term, leaseTermMap) }} / {{ plan.monthly_rent }}元 / {{ mapDict(plan.payment_method_label || plan.payment_method, paymentMethodMap) }}
-              </span>
+                <div><span class="text-gray-500">租期：</span>{{ mapDict(plan.lease_term_label || plan.lease_term, leaseTermMap) }}</div>
+                <div><span class="text-gray-500">月租金：</span>{{ plan.monthly_rent }} 元</div>
+                <div><span class="text-gray-500">支付方式：</span>{{ mapDict(plan.payment_method_label || plan.payment_method, paymentMethodMap) }}</div>
+              </div>
             </div>
           </div>
         </div>
