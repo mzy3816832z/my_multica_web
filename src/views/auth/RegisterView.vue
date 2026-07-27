@@ -54,6 +54,7 @@ async function onSubmit() {
       password: form.password,
     })
     // 注册成功后自动跳转登录页
+    showToast('注册成功，请登录')
     router.replace('/login')
   } catch {
     // 错误已在 request 拦截器中 toast

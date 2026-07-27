@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { PaginatedData, Apartment, RoomType, RentalPlan } from '@/types'
+import type { PaginatedData, Apartment, RoomType } from '@/types'
 
 export interface ApartmentListParams {
   keyword?: string
@@ -13,18 +13,18 @@ export interface ApartmentListParams {
   page_size?: number
 }
 
-export function getApartments(params?: ApartmentListParams) {
-  return request.get<PaginatedData<Apartment>>('/apartments', { params })
+export function getApartments(params?: ApartmentListParams): Promise<PaginatedData<Apartment>> {
+  return request.get('/apartments/', { params })
 }
 
-export function getApartmentDetail(id: number) {
-  return request.get<Apartment>('/apartments/' + id)
+export function getApartmentDetail(id: number): Promise<Apartment> {
+  return request.get('/apartments/' + id)
 }
 
-export function getRoomTypesByApartment(id: number) {
-  return request.get<RoomType[]>('/apartments/' + id + '/room-types')
+export function getRoomTypesByApartment(id: number): Promise<RoomType[]> {
+  return request.get('/apartments/' + id + '/room-types')
 }
 
-export function getRoomTypeDetail(id: number) {
-  return request.get<RoomType>('/room-types/' + id)
+export function getRoomTypeDetail(id: number): Promise<RoomType> {
+  return request.get('/room-types/' + id)
 }

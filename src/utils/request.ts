@@ -1,7 +1,6 @@
 import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig, type AxiosResponse } from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
-import { showToast } from 'vant'
 import type { ApiResponse } from '@/types'
 
 const request: AxiosInstance = axios.create({

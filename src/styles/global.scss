@@ -31,6 +31,12 @@ body {
   min-height: 100vh;
 }
 
+// 确保 Vant Toast 遮罩与文字始终可见（Popup 白底可能覆盖 Toast 的深色背景）
+.van-toast {
+  color: #fff !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
 // 通用页面内容区 padding
 .page-content {
   padding: vw(16);

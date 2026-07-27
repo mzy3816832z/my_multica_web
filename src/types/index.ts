@@ -1,33 +1,4 @@
-export interface AuditRecord {
-  id: number
-  apartment_id: number
-  type: 'first_review' | 'change_review'
-  status: 'pending' | 'approved' | 'rejected'
-  submitted_data: unknown
-  original_data?: unknown
-  changed_fields?: string[]
-  reject_reason?: string
-  reviewer_id?: number
-  created_at: string
-  updated_at: string
-}
-
-// 商家审核列表项（精简）
-export interface MerchantAuditItem {
-  id: number
-  apartment_id: number
-  type: 'first_review' | 'change_review'
-  status: 'pending' | 'approved' | 'rejected'
-  created_at: string
-  apartment_name?: string
-  cover_image?: string
-  changed_fields?: string[]
-}
-
-// 商家房源详情（含房型）
-export interface MerchantApartmentDetail extends Apartment {
-  room_types: RoomType[]
-}// 统一响应结构
+// 统一响应结构
 export interface ApiResponse<T = unknown> {
   code: number
   message: string
@@ -89,8 +60,8 @@ export interface Apartment {
   contact_phone?: string
   status?: string
   min_monthly_rent?: number
-  created_at?: string
-  updated_at?: string
+  created_at?: number
+  updated_at?: number
   is_favorite?: boolean
 }
 
@@ -113,18 +84,6 @@ export interface RoomType {
   min_monthly_rent?: number
 }
 
-export interface Message {
-  id: number
-  user_id: number
-  type: 'first_rejected' | 'change_rejected'
-  title: string
-  content: string
-  related_apartment_id: number
-  related_audit_id?: number
-  is_read: boolean
-  created_at: string
-}
-
 // 租期租金方案
 export interface RentalPlan {
   id: number
@@ -134,4 +93,49 @@ export interface RentalPlan {
   monthly_rent: number
   payment_method: string
   payment_method_label?: string
+}
+
+export interface Message {
+  id: number
+  user_id: number
+  type: 'first_rejected' | 'change_rejected'
+  title: string
+  content: string
+  related_apartment_id: number
+  related_audit_id?: number
+  is_read: boolean
+  created_at: number
+}
+
+export interface AuditRecord {
+  id: number
+  apartment_id: number
+  type: 'first_review' | 'change_review'
+  status: 'pending' | 'approved' | 'rejected'
+  submitted_data: unknown
+  original_data?: unknown
+  changed_fields?: string[]
+  reject_reason?: string
+  reviewer_id?: number
+  cover_image?: string
+  apartment_name?: string
+  created_at: number
+  updated_at: number
+}
+
+// 商家审核列表项（精简）
+export interface MerchantAuditItem {
+  id: number
+  apartment_id: number
+  type: 'first_review' | 'change_review'
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: number
+  apartment_name?: string
+  cover_image?: string
+  changed_fields?: string[]
+}
+
+// 商家房源详情（含房型）
+export interface MerchantApartmentDetail extends Apartment {
+  room_types: RoomType[]
 }
