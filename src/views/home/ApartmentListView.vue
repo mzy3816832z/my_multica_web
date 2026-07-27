@@ -75,7 +75,7 @@ async function loadStreets(parentId: number) {
   streetsLoading.value = true
   streetsError.value = ''
   try {
-    const res = await getDistricts({ parent_id: parentId })
+    const res = await getDistricts({ level: 2, parent_id: parentId })
     streets.value = res
   } catch {
     streetsError.value = '加载街道失败'
