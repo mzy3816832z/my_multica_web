@@ -411,8 +411,8 @@ onMounted(() => {
                 :type="filter.layout_types.includes(l.code) ? 'primary' : 'default'"
                 size="large"
                 round
-              >
                 @click="toggleLayoutType(l.code)"
+              >
                 {{ l.label }}
               </van-tag>
             </div>
@@ -428,8 +428,8 @@ onMounted(() => {
                 :type="filter.lease_terms.includes(t.code) ? 'primary' : 'default'"
                 size="large"
                 round
-              >
                 @click="toggleLeaseTerm(t.code)"
+              >
                 {{ t.label }}
               </van-tag>
             </div>
