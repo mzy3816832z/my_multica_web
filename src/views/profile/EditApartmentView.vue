@@ -6,6 +6,7 @@ import { useUiStore } from '@/stores/ui'
 import { getMerchantApartmentDetail, updateApartment } from '@/api/merchant'
 import { uploadImage } from '@/api/upload'
 import { mapDict, layoutTypeMap } from '@/utils/dictMaps'
+import type { RoomType, RentalPlan } from '@/types'
 
 const router = useRouter()
 const route = useRoute()
@@ -33,6 +34,7 @@ interface RoomTypeFormItem {
   facilities: string[]
   layout_type: string
   window_type: string
+  orientation: string
   floor: number | undefined
   rental_plans: RentalPlanFormItem[]
 }
@@ -101,6 +103,7 @@ async function loadApartmentDetail() {
       facilities: [...r.facilities],
       layout_type: r.layout_type,
       window_type: r.window_type,
+      orientation: r.orientation,
       floor: r.floor,
       rental_plans: (r.rental_plans || []).map((p: RentalPlan) => ({
         lease_term: p.lease_term,
@@ -165,6 +168,7 @@ const roomForm = reactive<RoomTypeFormItem>({
   facilities: [],
   layout_type: '',
   window_type: '',
+  orientation: '',
   floor: undefined,
   rental_plans: [],
 })
@@ -197,6 +201,7 @@ function openEditRoom(index: number) {
     facilities: [...room.facilities],
     layout_type: room.layout_type,
     window_type: room.window_type,
+    orientation: room.orientation,
     floor: room.floor,
     rental_plans: room.rental_plans.map(p => ({ ...p })),
   })
@@ -209,6 +214,7 @@ function resetRoomForm() {
   roomForm.facilities = []
   roomForm.layout_type = ''
   roomForm.window_type = ''
+  roomForm.orientation = ''
   roomForm.floor = undefined
   roomForm.rental_plans = []
   Object.keys(roomFormErrors).forEach(k => delete roomFormErrors[k])
@@ -359,6 +365,7 @@ function saveRoom() {
     facilities: [...roomForm.facilities],
     layout_type: roomForm.layout_type,
     window_type: roomForm.window_type,
+    orientation: roomForm.orientation,
     floor: Number(roomForm.floor),
     rental_plans: roomForm.rental_plans.map(p => ({
       lease_term: p.lease_term,
@@ -472,6 +479,7 @@ async function onSubmit() {
         facilities: r.facilities,
         layout_type: r.layout_type,
         window_type: r.window_type,
+        orientation: r.orientation,
         floor: r.floor as number,
         rental_plans: r.rental_plans.map(p => ({
           lease_term: p.lease_term,
