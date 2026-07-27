@@ -24,3 +24,4 @@
 | 13 | feature/admin-audit/step-13 | feature/admin-audit/step-11 | a477580 | 2026-07-24 | 待合并 |
 | 16 | feature/admin-audit/step-16 | feature/admin-audit/step-13 | TBD | 2026-07-24 | 待合并 |
 | 18 | feature/admin-audit/step-18 | feature/admin-audit/step-17 | TBD | 2026-07-24 | 待合并 |
+| 19 | feature/admin-audit/step-19 | feature/admin-audit/step-18 | TBD | 2026-07-27 | 待合并 |
