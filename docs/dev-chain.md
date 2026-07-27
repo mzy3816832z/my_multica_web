@@ -27,4 +27,4 @@
 | 19 | feature/admin-audit/step-19 | feature/admin-audit/step-18 | TBD | 2026-07-27 | 待合并 |
 | 21 | feature/admin-audit/step-21 | feature/admin-audit/step-20 | TBD | 2026-07-27 | 待合并 |
 
-| 05 | feature/apartment-list/step-05 | feature/apartment-list/enum-static | TBD | 2026-07-27 | 待合并 |
+| 05 | feature/apartment-list/step-05 | feature/apartment-list/enum-static | a8c03c1 | 2026-07-27 | 已合并 |
