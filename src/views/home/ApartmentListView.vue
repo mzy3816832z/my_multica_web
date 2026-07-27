@@ -35,25 +35,45 @@ const filter = reactive({
   max_price: undefined as number | undefined,
 })
 
-// 行政区静态映射（上海16区）
-const districts = ref<District[]>([
-  { id: 1, name: '黄浦区', parent_id: null, level: 1, code: null, sort: 1 },
-  { id: 2, name: '静安区', parent_id: null, level: 1, code: null, sort: 2 },
-  { id: 3, name: '徐汇区', parent_id: null, level: 1, code: null, sort: 3 },
-  { id: 4, name: '长宁区', parent_id: null, level: 1, code: null, sort: 4 },
-  { id: 5, name: '普陀区', parent_id: null, level: 1, code: null, sort: 5 },
-  { id: 6, name: '虹口区', parent_id: null, level: 1, code: null, sort: 6 },
-  { id: 7, name: '杨浦区', parent_id: null, level: 1, code: null, sort: 7 },
-  { id: 8, name: '浦东新区', parent_id: null, level: 1, code: null, sort: 8 },
-  { id: 9, name: '闵行区', parent_id: null, level: 1, code: null, sort: 9 },
-  { id: 10, name: '宝山区', parent_id: null, level: 1, code: null, sort: 10 },
-  { id: 11, name: '嘉定区', parent_id: null, level: 1, code: null, sort: 11 },
-  { id: 12, name: '金山区', parent_id: null, level: 1, code: null, sort: 12 },
-  { id: 13, name: '松江区', parent_id: null, level: 1, code: null, sort: 13 },
-  { id: 14, name: '青浦区', parent_id: null, level: 1, code: null, sort: 14 },
-  { id: 15, name: '奉贤区', parent_id: null, level: 1, code: null, sort: 15 },
-  { id: 16, name: '崇明区', parent_id: null, level: 1, code: null, sort: 16 },
+
+// 行政区名称静态映射（仅用于展示名称和排序，真实ID从接口获取）
+const districtNameMap = new Map<string, number>([
+  ['黄浦区', 1],
+  ['静安区', 2],
+  ['徐汇区', 3],
+  ['长宁区', 4],
+  ['普陀区', 5],
+  ['虹口区', 6],
+  ['杨浦区', 7],
+  ['浦东新区', 8],
+  ['闵行区', 9],
+  ['宝山区', 10],
+  ['嘉定区', 11],
+  ['金山区', 12],
+  ['松江区', 13],
+  ['青浦区', 14],
+  ['奉贤区', 15],
+  ['崇明区', 16],
 ])
+
+const districts = ref<District[]>([])
+
+// 加载真实行政区数据（带真实ID）
+async function loadDistricts() {
+  try {
+    const res = await getDistricts({ level: 1 })
+    // 按 districtNameMap 中的顺序排序，保持前端展示顺序一致
+    const sorted = res.sort((a: District, b: District) => {
+      const sortA = districtNameMap.get(a.name) || 999
+      const sortB = districtNameMap.get(b.name) || 999
+      return sortA - sortB
+    })
+    districts.value = sorted
+  } catch {
+    // 降级：如果接口失败，保持空数组，不显示行政区
+    districts.value = []
+  }
+}
 
 const streets = ref<District[]>([])
 
@@ -235,6 +255,7 @@ async function toggleFavorite(apartment: Apartment, event: Event) {
 
 // ================= 初始化 =================
 onMounted(() => {
+  loadDistricts()
   fetchList(true)
 })
 </script>
