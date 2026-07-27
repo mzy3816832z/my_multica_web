@@ -1,4 +1,33 @@
-// 统一响应结构
+export interface AuditRecord {
+  id: number
+  apartment_id: number
+  type: 'first_review' | 'change_review'
+  status: 'pending' | 'approved' | 'rejected'
+  submitted_data: unknown
+  original_data?: unknown
+  changed_fields?: string[]
+  reject_reason?: string
+  reviewer_id?: number
+  created_at: string
+  updated_at: string
+}
+
+// 商家审核列表项（精简）
+export interface MerchantAuditItem {
+  id: number
+  apartment_id: number
+  type: 'first_review' | 'change_review'
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+  apartment_name?: string
+  cover_image?: string
+  changed_fields?: string[]
+}
+
+// 商家房源详情（含房型）
+export interface MerchantApartmentDetail extends Apartment {
+  room_types: RoomType[]
+}// 统一响应结构
 export interface ApiResponse<T = unknown> {
   code: number
   message: string
