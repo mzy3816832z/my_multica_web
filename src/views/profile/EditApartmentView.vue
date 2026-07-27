@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
 import { getMerchantApartmentDetail, updateApartment } from '@/api/merchant'
 import { uploadImage } from '@/api/upload'
-import type { RoomType, RentalPlan } from '@/types'
+import { mapDict, layoutTypeMap } from '@/utils/dictMaps'
 
 const router = useRouter()
 const route = useRoute()
@@ -613,7 +613,7 @@ onMounted(() => {
             <div class="flex-1 min-w-0">
               <div class="text-sm font-bold text-gray-900 truncate">{{ room.name }}</div>
               <div class="text-xs text-gray-500 mt-1">
-                {{ room.layout_type }} ·
+                {{ mapDict(room.layout_type, layoutTypeMap) }} ·
                 {{ room.floor }}层 ·
                 {{ room.rental_plans.length }} 组方案
               </div>
