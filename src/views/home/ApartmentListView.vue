@@ -28,9 +28,9 @@ const showFilter = ref(false)
 
 const filter = reactive({
   district_id: undefined as number | undefined,
-  street_id: undefined as number | undefined,
-  layout_type: '',
-  lease_term: '',
+  street_ids: [] as number[],
+  layout_types: [] as string[],
+  lease_terms: [] as string[],
   min_price: undefined as number | undefined,
   max_price: undefined as number | undefined,
 })
@@ -85,9 +85,9 @@ const streetsError = ref('')
 const activeFilterCount = computed(() => {
   let count = 0
   if (filter.district_id !== undefined) count++
-  if (filter.street_id !== undefined) count++
-  if (filter.layout_type) count++
-  if (filter.lease_term) count++
+  if (filter.street_ids.length > 0) count++
+  if (filter.layout_types.length > 0) count++
+  if (filter.lease_terms.length > 0) count++
   if (filter.min_price !== undefined || filter.max_price !== undefined) count++
   return count
 })
@@ -107,7 +107,7 @@ async function loadStreets(parentId: number) {
 }
 
 watch(() => filter.district_id, (val) => {
-  filter.street_id = undefined
+  filter.street_ids = []
   streets.value = []
   if (val) {
     loadStreets(val)
@@ -123,9 +123,9 @@ async function fetchList(isRefresh = false) {
     const params = {
       keyword: keyword.value || undefined,
       district_id: filter.district_id,
-      street_id: filter.street_id,
-      layout_type: filter.layout_type || undefined,
-      lease_term: filter.lease_term || undefined,
+      street_ids: filter.street_ids.length > 0 ? filter.street_ids : undefined,
+      layout_types: filter.layout_types.length > 0 ? filter.layout_types : undefined,
+      lease_terms: filter.lease_terms.length > 0 ? filter.lease_terms : undefined,
       min_price: filter.min_price,
       max_price: filter.max_price,
       page: currentPage,
@@ -172,9 +172,9 @@ function onFilterConfirm() {
 
 function onFilterReset() {
   filter.district_id = undefined
-  filter.street_id = undefined
-  filter.layout_type = ''
-  filter.lease_term = ''
+  filter.street_ids = []
+  filter.layout_types = []
+  filter.lease_terms = []
   filter.min_price = undefined
   filter.max_price = undefined
   streets.value = []
@@ -191,6 +191,24 @@ function goDetail(id: number) {
 
 function goCreate() {
   router.push('/profile/apartments/create')
+}
+
+function toggleStreet(id: number) {
+  const idx = filter.street_ids.indexOf(id)
+  if (idx > -1) filter.street_ids.splice(idx, 1)
+  else filter.street_ids.push(id)
+}
+
+function toggleLayoutType(code: string) {
+  const idx = filter.layout_types.indexOf(code)
+  if (idx > -1) filter.layout_types.splice(idx, 1)
+  else filter.layout_types.push(code)
+}
+
+function toggleLeaseTerm(code: string) {
+  const idx = filter.lease_terms.indexOf(code)
+  if (idx > -1) filter.lease_terms.splice(idx, 1)
+  else filter.lease_terms.push(code)
 }
 
 async function toggleFavorite(apartment: Apartment, event: Event) {
@@ -372,10 +390,10 @@ onMounted(() => {
               <van-tag
                 v-for="s in streets"
                 :key="s.id"
-                :type="filter.street_id === s.id ? 'primary' : 'default'"
+                :type="filter.street_ids.includes(s.id) ? 'primary' : 'default'"
                 size="large"
                 round
-                @click="filter.street_id = filter.street_id === s.id ? undefined : s.id"
+                @click="toggleStreet(s.id)"
               >
                 {{ s.name }}
               </van-tag>
@@ -389,11 +407,11 @@ onMounted(() => {
               <van-tag
                 v-for="l in layoutTypes"
                 :key="l.code"
-                :type="filter.layout_type === l.code ? 'primary' : 'default'"
+                :type="filter.layout_types.includes(l.code) ? 'primary' : 'default'"
                 size="large"
                 round
-                @click="filter.layout_type = filter.layout_type === l.code ? '' : l.code"
               >
+                @click="toggleLayoutType(l.code)"
                 {{ l.label }}
               </van-tag>
             </div>
@@ -406,11 +424,11 @@ onMounted(() => {
               <van-tag
                 v-for="t in leaseTerms"
                 :key="t.code"
-                :type="filter.lease_term === t.code ? 'primary' : 'default'"
+                :type="filter.lease_terms.includes(t.code) ? 'primary' : 'default'"
                 size="large"
                 round
-                @click="filter.lease_term = filter.lease_term === t.code ? '' : t.code"
               >
+                @click="toggleLeaseTerm(t.code)"
                 {{ t.label }}
               </van-tag>
             </div>

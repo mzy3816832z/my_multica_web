@@ -4,9 +4,9 @@ import type { PaginatedData, Apartment, RoomType } from '@/types'
 export interface ApartmentListParams {
   keyword?: string
   district_id?: number
-  street_id?: number
-  layout_type?: string
-  lease_term?: string
+  street_ids?: number[]
+  layout_types?: string[]
+  lease_terms?: string[]
   min_price?: number
   max_price?: number
   page?: number
