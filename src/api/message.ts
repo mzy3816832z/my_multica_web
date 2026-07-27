@@ -6,13 +6,13 @@ export function getMessages(params?: { page?: number; page_size?: number }): Pro
 }
 
 export function markMessageRead(id: number): Promise<void> {
-  return request.post('/messages/' + id + '/read', {})
+  return request.post('/messages/' + id + '/read/', {})
 }
 
 export interface UnreadCountResult {
-  count: number
+  unread_count: number
 }
 
 export function getUnreadCount(): Promise<UnreadCountResult> {
-  return request.get('/messages/unread-count')
+  return request.get('/messages/unread-count/')
 }

@@ -54,7 +54,7 @@ export const useMessageStore = defineStore('message', () => {
   async function fetchUnreadCount() {
     try {
       const res = await getUnreadCount()
-      unreadCount.value = res.count
+      unreadCount.value = res.unread_count
     } catch {
       // 静默失败
     }
