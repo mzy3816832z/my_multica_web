@@ -14,22 +14,20 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { getAdminAuditDetail, approveAudit, rejectAudit } from '@/api/admin'
-import { getDistricts } from '@/api/dict'
+import { useDistrictStore } from '@/stores/district'
 import { useUiStore } from '@/stores/ui'
-import type { AuditRecord, District } from '@/types'
+import type { AuditRecord } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
 const uiStore = useUiStore()
+const districtStore = useDistrictStore()
 
 const auditId = Number(route.params.id)
 const detail = ref<AuditRecord | null>(null)
 const loading = ref(false)
 const rejectReason = ref('')
 const showRejectForm = ref(false)
-
-const districtMap = ref<Record<number, string>>({})
-const streetMap = ref<Record<number, string>>({})
 
 async function loadDetail() {
   loading.value = true
@@ -40,25 +38,6 @@ async function loadDetail() {
     // 错误已在 request 拦截器中 toast
   } finally {
     loading.value = false
-  }
-}
-
-async function loadDistrictsMap() {
-  try {
-    const [districts, streets] = await Promise.all([
-      getDistricts({ level: 1 }),
-      getDistricts({ level: 2 }),
-    ])
-    districtMap.value = districts.reduce((m: Record<number, string>, d: District) => {
-      m[d.id] = d.name
-      return m
-    }, {})
-    streetMap.value = streets.reduce((m: Record<number, string>, s: District) => {
-      m[s.id] = s.name
-      return m
-    }, {})
-  } catch {
-    // 错误已在 request 拦截器中 toast
   }
 }
 
@@ -173,15 +152,14 @@ function formatValue(val: unknown): string {
 const baseFields = [
   { key: 'name', label: '房源名称' },
   { key: 'description', label: '房源描述' },
-  { key: 'district_id', label: '行政区', format: (v: unknown) => districtMap.value[Number(v)] || '-' },
-  { key: 'street_id', label: '街道', format: (v: unknown) => streetMap.value[Number(v)] || '-' },
+  { key: 'district_id', label: '行政区', format: (v: unknown) => districtStore.getDistrictName(Number(v)) },
+  { key: 'street_id', label: '街道', format: (v: unknown) => districtStore.getStreetName(Number(v)) },
   { key: 'detail_address', label: '详细地址' },
   { key: 'contact_phone', label: '联系电话' },
 ]
 
 onMounted(() => {
   loadDetail()
-  loadDistrictsMap()
 })
 </script>
 

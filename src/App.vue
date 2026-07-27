@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
+import { useDistrictStore } from '@/stores/district'
 
 const route = useRoute()
 const uiStore = useUiStore()
 const authStore = useAuthStore()
+const districtStore = useDistrictStore()
 
 const showTabBar = computed(() => {
   return authStore.isLoggedIn && !!authStore.role && !route.meta.hideTabBar
@@ -17,6 +19,17 @@ const activeTab = computed(() => {
   if (path.startsWith('/profile')) return 'profile'
   return 'apartments'
 })
+
+// 登录成功后自动加载行政区划数据（应用级缓存，只加载一次）
+watch(
+  () => authStore.isLoggedIn,
+  (loggedIn) => {
+    if (loggedIn) {
+      districtStore.loadDistricts()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
