@@ -97,8 +97,8 @@ export interface RentalPlan {
 
 export interface Message {
   id: number
-  user_id: number
   type: 'first_rejected' | 'change_rejected'
+  type_display?: string
   title: string
   content: string
   related_apartment_id: number
@@ -111,7 +111,9 @@ export interface AuditRecord {
   id: number
   apartment_id: number
   type: 'first_review' | 'change_review'
+  type_display?: string
   status: 'pending' | 'approved' | 'rejected'
+  status_display?: string
   submitted_data: unknown
   original_data?: unknown
   changed_fields?: string[]
@@ -133,6 +135,7 @@ export interface MerchantAuditItem {
   apartment_name?: string
   cover_image?: string
   changed_fields?: string[]
+  reject_reason?: string
 }
 
 // 商家房源详情（含房型）

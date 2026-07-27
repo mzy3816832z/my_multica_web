@@ -10,5 +10,5 @@ export function addFavorite(apartmentId: number): Promise<void> {
 }
 
 export function removeFavorite(apartmentId: number): Promise<void> {
-  return request.delete('/favorites/' + apartmentId)
+  return request.delete('/favorites/by-apartment/' + apartmentId)
 }

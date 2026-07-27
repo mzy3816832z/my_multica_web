@@ -282,36 +282,37 @@ onMounted(() => {
           <div
             v-for="item in list"
             :key="item.id"
-            class="bg-white rounded-xl overflow-hidden shadow-sm"
+            class="flex bg-white rounded-xl overflow-hidden shadow-sm"
             @click="goDetail(item.id)"
           >
-            <!-- 封面图 -->
-            <div class="relative h-44 bg-gray-100">
+            <!-- 左侧图片 -->
+            <div class="w-28 h-28 flex-shrink-0 bg-gray-100">
               <van-image
                 :src="item.cover_image"
                 fit="cover"
                 class="w-full h-full"
                 :alt="item.name"
               />
-              <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                ¥{{ item.min_monthly_rent || '?' }}/月起
+            </div>
+            <!-- 右侧信息 -->
+            <div class="flex-1 p-3 flex flex-col justify-between min-w-0">
+              <div>
+                <h3 class="text-base font-bold text-gray-900 line-clamp-1">{{ item.name }}</h3>
+                <p class="text-sm text-gray-500 mt-1 flex items-center">
+                  <van-icon name="location-o" class="mr-1" />
+                  {{ item.district_name || '' }} {{ item.street_name || '' }}
+                </p>
               </div>
-              <div v-if="authStore.isTenant" class="absolute top-2 right-2">
+              <div class="flex items-center justify-between mt-2">
+                <span class="text-primary font-bold">¥{{ item.min_monthly_rent || '?' }}/月起</span>
                 <van-icon
+                  v-if="authStore.isTenant"
                   :name="item.is_favorite ? 'star' : 'star-o'"
-                  :class="item.is_favorite ? 'text-warning' : 'text-white'"
-                  class="text-xl drop-shadow"
+                  :class="item.is_favorite ? 'text-warning' : 'text-gray-400'"
+                  class="text-xl"
                   @click.stop="toggleFavorite(item, $event)"
                 />
               </div>
-            </div>
-            <!-- 信息区 -->
-            <div class="p-3">
-              <h3 class="text-base font-bold text-gray-900 line-clamp-1">{{ item.name }}</h3>
-              <p class="text-sm text-gray-500 mt-1 flex items-center">
-                <van-icon name="location-o" class="mr-1" />
-                {{ item.district_name || '' }} {{ item.street_name || '' }}
-              </p>
             </div>
           </div>
         </div>

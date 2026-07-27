@@ -42,7 +42,13 @@ export function getMerchantApartmentDetail(id: number): Promise<MerchantApartmen
   return request.get('/merchant/apartments/' + id)
 }
 
-export function updateApartment(id: number, payload: CreateApartmentPayload): Promise<void> {
+export interface UpdateApartmentResult {
+  apartment_id: number
+  audit_id: number | null
+  updated: boolean
+}
+
+export function updateApartment(id: number, payload: CreateApartmentPayload): Promise<UpdateApartmentResult> {
   return request.put('/merchant/apartments/' + id, payload)
 }
 
