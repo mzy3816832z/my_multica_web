@@ -38,7 +38,7 @@ export function getMerchantApartments(params?: { page?: number; page_size?: numb
 }
 
 export function getMerchantApartmentDetail(id: number): Promise<MerchantApartmentDetail> {
-  return request.get('/merchant/apartments/' + id + '/')
+  return request.get(`/merchant/apartments/${id}/`)
 }
 
 export interface UpdateApartmentResult {
@@ -48,11 +48,11 @@ export interface UpdateApartmentResult {
 }
 
 export function updateApartment(id: number, payload: CreateApartmentPayload): Promise<UpdateApartmentResult> {
-  return request.put('/merchant/apartments/' + id + '/', payload)
+  return request.put(`/merchant/apartments/${id}/`, payload)
 }
 
 export function deleteApartment(id: number): Promise<void> {
-  return request.delete('/merchant/apartments/' + id + '/')
+  return request.delete(`/merchant/apartments/${id}/`)
 }
 
 export function getMerchantAudits(params?: { page?: number; page_size?: number }): Promise<PaginatedData<MerchantAuditItem>> {

@@ -18,13 +18,13 @@ export function getApartments(params?: ApartmentListParams): Promise<PaginatedDa
 }
 
 export function getApartmentDetail(id: number): Promise<Apartment> {
-  return request.get('/apartments/' + id + '/')
+  return request.get(`/apartments/${id}/`)
 }
 
 export function getRoomTypesByApartment(id: number): Promise<RoomType[]> {
-  return request.get('/apartments/' + id + '/room-types/')
+  return request.get(`/apartments/${id}/room-types/`)
 }
 
 export function getRoomTypeDetail(id: number): Promise<RoomType> {
-  return request.get('/room-types/' + id + '/')
+  return request.get(`/room-types/${id}/`)
 }

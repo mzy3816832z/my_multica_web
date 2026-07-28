@@ -6,7 +6,7 @@ export function getMessages(params?: { page?: number; page_size?: number }): Pro
 }
 
 export function markMessageRead(id: number): Promise<void> {
-  return request.post('/messages/' + id + '/read/', {})
+  return request.post(`/messages/${id}/read/`, {})
 }
 
 export interface UnreadCountResult {
