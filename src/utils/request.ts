@@ -32,7 +32,7 @@ request.interceptors.response.use(
       showToast(res.message || '请求失败')
       return Promise.reject(new Error(res.message || '请求失败')) as any
     }
-    return res.data as any
+    return res.data
   },
   (error: AxiosError<ApiResponse>) => {
     const uiStore = useUiStore()
