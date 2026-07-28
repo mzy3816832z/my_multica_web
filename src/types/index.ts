@@ -76,8 +76,6 @@ export interface RoomType {
   layout_type_label?: string
   window_type: string
   window_type_label?: string
-  orientation: string
-  orientation_label?: string
   floor: number
   sort: number
   rental_plans?: RentalPlan[]
