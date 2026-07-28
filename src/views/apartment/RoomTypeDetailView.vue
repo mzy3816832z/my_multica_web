@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { getRoomTypeDetail } from '@/api/apartment'
@@ -10,7 +10,7 @@ const route = useRoute()
 const router = useRouter()
 const uiStore = useUiStore()
 
-const roomTypeId = Number(route.params.id)
+const roomTypeId = ref(Number(route.params.id))
 const roomType = ref<RoomType | null>(null)
 const loading = ref(false)
 
@@ -50,7 +50,7 @@ function getLeaseLabel(code: string) {
 }
 
 async function fetchDetail() {
-  if (!roomTypeId || isNaN(roomTypeId)) {
+  if (!roomTypeId.value || isNaN(roomTypeId.value)) {
     showToast('户型ID无效')
     router.back()
     return
@@ -58,7 +58,7 @@ async function fetchDetail() {
   loading.value = true
   uiStore.showLoading('加载中...')
   try {
-    const res = await getRoomTypeDetail(roomTypeId)
+    const res = await getRoomTypeDetail(roomTypeId.value)
     roomType.value = res
   } catch {
     // 错误已在 request 拦截器中 toast
@@ -78,6 +78,14 @@ const currentImageIndex = ref(0)
 function onImageChange(index: number) {
   currentImageIndex.value = index
 }
+
+watch(() => route.params.id, (newId) => {
+  const id = Number(newId)
+  if (id && !isNaN(id) && id !== roomTypeId.value) {
+    roomTypeId.value = id
+    fetchDetail()
+  }
+})
 
 onMounted(() => {
   loadDicts()

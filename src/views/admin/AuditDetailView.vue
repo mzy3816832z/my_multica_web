@@ -11,7 +11,7 @@ import {
   mapFacilities,
 } from '@/utils/dictMaps'
 import { getDistrictName, getStreetName } from '@/utils/districtMaps'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { getAdminAuditDetail, approveAudit, rejectAudit } from '@/api/admin'
@@ -22,7 +22,7 @@ const route = useRoute()
 const router = useRouter()
 const uiStore = useUiStore()
 
-const auditId = Number(route.params.id)
+const auditId = ref(Number(route.params.id))
 const detail = ref<AuditRecord | null>(null)
 const loading = ref(false)
 const rejectReason = ref('')
@@ -31,7 +31,7 @@ const showRejectForm = ref(false)
 async function loadDetail() {
   loading.value = true
   try {
-    const res = await getAdminAuditDetail(auditId)
+    const res = await getAdminAuditDetail(auditId.value)
     detail.value = res
   } catch {
     // 错误已在 request 拦截器中 toast
@@ -52,7 +52,7 @@ async function onApprove() {
       message: '审核通过后，房源将正式上架或变更生效，确定继续吗？',
     })
     uiStore.showLoading('处理中...')
-    await approveAudit(auditId)
+    await approveAudit(auditId.value)
     showToast('已通过')
     await loadDetail()
   } catch (err: any) {
@@ -81,7 +81,7 @@ async function onConfirmReject() {
   }
   try {
     uiStore.showLoading('处理中...')
-    await rejectAudit(auditId, rejectReason.value.trim())
+    await rejectAudit(auditId.value, rejectReason.value.trim())
     showToast('已驳回')
     showRejectForm.value = false
     rejectReason.value = ''
@@ -156,6 +156,14 @@ const baseFields = [
   { key: 'detail_address', label: '详细地址' },
   { key: 'contact_phone', label: '联系电话' },
 ]
+
+watch(() => route.params.id, (newId) => {
+  const id = Number(newId)
+  if (id && !isNaN(id) && id !== auditId.value) {
+    auditId.value = id
+    loadDetail()
+  }
+})
 
 onMounted(() => {
   loadDetail()

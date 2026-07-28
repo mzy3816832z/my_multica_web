@@ -13,7 +13,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 const uiStore = useUiStore()
 
-const apartmentId = Number(route.params.id)
+const apartmentId = ref(Number(route.params.id))
 
 // ================= 表单数据 =================
 const form = reactive({
@@ -88,7 +88,7 @@ async function loadApartmentDetail() {
   if (!apartmentId) return
   loadingDetail.value = true
   try {
-    const data = await getMerchantApartmentDetail(apartmentId)
+    const data = await getMerchantApartmentDetail(apartmentId.value)
     form.name = data.name
     form.cover_image = data.cover_image
     form.description = data.description || ''
@@ -488,7 +488,7 @@ async function onSubmit() {
         })),
       })),
     }
-    await updateApartment(apartmentId, payload)
+    await updateApartment(apartmentId.value, payload)
     showToast('保存成功')
     router.replace('/profile/my-apartments')
   } catch {
@@ -497,6 +497,14 @@ async function onSubmit() {
     uiStore.hideLoading()
   }
 }
+
+watch(() => route.params.id, (newId) => {
+  const id = Number(newId)
+  if (id && !isNaN(id) && id !== apartmentId.value) {
+    apartmentId.value = id
+    loadApartmentDetail()
+  }
+})
 
 // ================= 初始化 =================
 onMounted(() => {

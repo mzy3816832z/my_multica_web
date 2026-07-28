@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUiStore } from '@/stores/ui'
@@ -12,13 +12,13 @@ const router = useRouter()
 const authStore = useAuthStore()
 const uiStore = useUiStore()
 
-const apartmentId = Number(route.params.id)
+const apartmentId = ref(Number(route.params.id))
 const apartment = ref<Apartment | null>(null)
 const roomTypes = ref<RoomType[]>([])
 const loading = ref(false)
 
 async function fetchDetail() {
-  if (!apartmentId || isNaN(apartmentId)) {
+  if (!apartmentId.value || isNaN(apartmentId.value)) {
     showToast('房源ID无效')
     router.back()
     return
@@ -27,8 +27,8 @@ async function fetchDetail() {
   uiStore.showLoading('加载中...')
   try {
     const [aptRes, roomsRes] = await Promise.all([
-      getApartmentDetail(apartmentId),
-      getRoomTypesByApartment(apartmentId),
+      getApartmentDetail(apartmentId.value),
+      getRoomTypesByApartment(apartmentId.value),
     ])
     apartment.value = aptRes
     roomTypes.value = roomsRes || []
@@ -71,6 +71,14 @@ function goRoomTypeDetail(roomTypeId: number) {
 function goBack() {
   router.back()
 }
+
+watch(() => route.params.id, (newId) => {
+  const id = Number(newId)
+  if (id && !isNaN(id) && id !== apartmentId.value) {
+    apartmentId.value = id
+    fetchDetail()
+  }
+})
 
 onMounted(() => {
   fetchDetail()
