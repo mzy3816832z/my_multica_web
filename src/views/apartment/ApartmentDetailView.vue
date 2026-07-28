@@ -47,8 +47,9 @@ async function toggleFavorite() {
     return
   }
   if (!apartment.value) return
+  const originalState = apartment.value.is_favorite
   try {
-    if (apartment.value.is_favorite) {
+    if (originalState) {
       await removeFavorite(apartment.value.id)
       apartment.value.is_favorite = false
       showToast('已取消收藏')
@@ -58,7 +59,8 @@ async function toggleFavorite() {
       showToast('收藏成功')
     }
   } catch {
-    // 错误已在 request 拦截器中 toast
+    apartment.value.is_favorite = originalState
+    showToast('操作失败，请重试')
   }
 }
 

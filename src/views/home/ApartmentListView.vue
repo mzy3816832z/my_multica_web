@@ -238,8 +238,9 @@ async function toggleFavorite(apartment: Apartment, event: Event) {
     router.push({ path: '/login', query: { redirect: '/apartments' } })
     return
   }
+  const originalState = apartment.is_favorite
   try {
-    if (apartment.is_favorite) {
+    if (originalState) {
       await removeFavorite(apartment.id)
       apartment.is_favorite = false
       showToast('已取消收藏')
@@ -249,7 +250,8 @@ async function toggleFavorite(apartment: Apartment, event: Event) {
       showToast('收藏成功')
     }
   } catch {
-    // 错误已在 request 拦截器中 toast
+    apartment.is_favorite = originalState
+    showToast('操作失败，请重试')
   }
 }
 
