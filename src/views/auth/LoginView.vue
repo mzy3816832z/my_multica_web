@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { loginByPassword, loginByCode, sendSmsCode } from '@/api/auth'
@@ -57,6 +57,13 @@ async function handleSendSms() {
     // 错误已在 request 拦截器中 toast
   }
 }
+
+onUnmounted(() => {
+  if (smsTimer.value) {
+    clearInterval(smsTimer.value)
+    smsTimer.value = null
+  }
+})
 
 function handleLoginSuccess(res: LoginResult) {
   authStore.setToken(res.access_token, res.refresh_token)

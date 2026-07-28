@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { sendSmsCode, register } from '@/api/auth'
 
@@ -43,6 +43,13 @@ async function handleSendSms() {
     // 错误已在 request 拦截器中 toast
   }
 }
+
+onUnmounted(() => {
+  if (smsTimer.value) {
+    clearInterval(smsTimer.value)
+    smsTimer.value = null
+  }
+})
 
 async function onSubmit() {
   if (!canSubmit.value) return
