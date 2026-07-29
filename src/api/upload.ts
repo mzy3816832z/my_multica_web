@@ -8,5 +8,9 @@ export interface UploadResult {
 export function uploadImage(file: File): Promise<UploadResult> {
   const formData = new FormData()
   formData.append('file', file)
-  return request.post('/uploads/image/', formData)
+  return request.post('/uploads/image/', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
 }
