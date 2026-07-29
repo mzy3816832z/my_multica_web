@@ -26,5 +26,5 @@ export function getRoomTypesByApartment(id: number): Promise<RoomType[]> {
 }
 
 export function getRoomTypeDetail(id: number): Promise<RoomType> {
-  return request.get(`/room-types/${id}/`)
+  return request.get(`/apartments/room-types/${id}/`)
 }
